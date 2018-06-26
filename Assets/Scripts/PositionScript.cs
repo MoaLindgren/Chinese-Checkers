@@ -65,10 +65,7 @@ public class PositionScript : MonoBehaviour
                 gameObject.tag = "WhiteNest";
             }
         }
-
-
     }
-
     void OnMouseDown()
     {
         print(xPosition + ", " + yPosition);

@@ -10,6 +10,12 @@ TagManager:
   - GreenNest
   - BlackNest
   - WhiteNest
+  - RedPlayer
+  - BluePlayer
+  - YellowPlayer
+  - GreenPlayer
+  - BlackPlayer
+  - WhitePlayer
   layers:
   - Default
   - TransparentFX

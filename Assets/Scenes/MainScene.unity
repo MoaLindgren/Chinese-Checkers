@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   positions: {fileID: 1329813146461074, guid: 64ae89d941a04ee49aaf8e0391ddd118, type: 2}
-  canvas: {fileID: 0}
+  tile: {fileID: 1983900741243116, guid: 5e1f57c1681867444abce9f5a6df0725, type: 2}
 --- !u!1 &956091201
 GameObject:
   m_ObjectHideFlags: 0

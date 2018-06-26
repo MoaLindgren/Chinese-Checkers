@@ -59,7 +59,7 @@ public class CoordinateScript : MonoBehaviour
     IEnumerator SetBoard()
     {
 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         switch(numberOfPlayers)
         {
             case 2:
@@ -88,7 +88,6 @@ public class CoordinateScript : MonoBehaviour
                 GameObject tempTile = Instantiate(tile, new Vector3(position.transform.position.x, position.transform.position.y, 0), Quaternion.identity);
                 tempTile.tag = currentColor[i] + "Player";
                 tempTile.GetComponent<Renderer>().material.SetColor("_Color", color[i]);
-
             }
         }
         currentColor.Clear();

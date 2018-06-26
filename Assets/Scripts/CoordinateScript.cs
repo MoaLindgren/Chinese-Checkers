@@ -17,19 +17,24 @@ public class CoordinateScript : MonoBehaviour
                            { -4, -10 }, { -5, -11 }, { -6, -12 }, { -7, -13 },
                            { 2, -14 }, { 3, -15 }, { 4, -16 }, { 5, -17 } };
 
-    int xCoord, yCoord, numberOfRows, counter;
+    int xCoord, yCoord, numberOfRows, counter, numberOfPlayers;
     float distance;
 
     [SerializeField]
-    GameObject positions;
+    GameObject positions, tile;
+    GameObject[] tempNest;
     PositionScript positionScript;
     Text text;
+    List<string> currentColor;
+    List<Color> color;
 
     void Start()
     {
+        numberOfPlayers = 6;
         numberOfRows = 17;
         counter = 0;
         InstantiatePositions();
+        StartCoroutine(SetBoard());
     }
     void InstantiatePositions()
     {
@@ -50,5 +55,42 @@ public class CoordinateScript : MonoBehaviour
                 pos.name = "Position_" + counter + ": (" + yCoord + ", " + xCoord + ")";
             }
         }
+    }
+    IEnumerator SetBoard()
+    {
+
+        yield return new WaitForSeconds(2);
+        switch(numberOfPlayers)
+        {
+            case 2:
+                currentColor = new List<string>() { "Red", "Blue" };
+                color = new List<Color>() { Color.red, Color.blue };
+                break;
+            case 3:
+                currentColor = new List<string>() { "Red", "Blue", "Yellow", "Green", "Black", "White" };
+                color = new List<Color>() { Color.red, Color.blue, Color.yellow, Color.green, Color.black, Color.white };
+                break;
+            case 4:
+                currentColor = new List<string>() { "Red", "Blue", "Yellow", "Green" };
+                color = new List<Color>() { Color.red, Color.blue, Color.yellow, Color.green };
+                break;
+            case 6:
+                currentColor = new List<string>() { "Red", "Blue", "Yellow", "Green", "Black", "White" };
+                color = new List<Color>() { Color.red, Color.blue, Color.yellow, Color.green, Color.black, Color.white };
+                break;
+        }
+
+        for(int i = 0; i < currentColor.Count; i++)
+        {
+            tempNest = GameObject.FindGameObjectsWithTag(currentColor[i] + "Nest");
+            foreach (GameObject position in tempNest)
+            {
+                GameObject tempTile = Instantiate(tile, new Vector3(position.transform.position.x, position.transform.position.y, 0), Quaternion.identity);
+                tempTile.tag = currentColor[i] + "Player";
+                tempTile.GetComponent<Renderer>().material.SetColor("_Color", color[i]);
+
+            }
+        }
+        currentColor.Clear();
     }
 }

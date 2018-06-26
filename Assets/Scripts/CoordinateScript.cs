@@ -22,6 +22,7 @@ public class CoordinateScript : MonoBehaviour
 
     [SerializeField]
     GameObject positions;
+    PositionScript positionScript;
     Text text;
 
     void Start()
@@ -30,7 +31,6 @@ public class CoordinateScript : MonoBehaviour
         counter = 0;
         InstantiatePositions();
     }
-
     void InstantiatePositions()
     {
         for (int i = 0; i < numberOfRows; i++)
@@ -44,6 +44,9 @@ public class CoordinateScript : MonoBehaviour
                 xCoord = tilesAndXCoord[i, 0] + y;
 
                 GameObject pos = Instantiate(positions, new Vector3(coordinates[i, 0] + distance, coordinates[i, 1], 1), Quaternion.identity);
+                positionScript = pos.GetComponent<PositionScript>();
+                positionScript.xPosition = xCoord;
+                positionScript.yPosition = yCoord;
                 pos.name = "Position_" + counter + ": (" + yCoord + ", " + xCoord + ")";
             }
         }

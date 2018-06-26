@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - BlueNest
+  - RedNest
+  - YellowNest
+  - GreenNest
+  - BlackNest
+  - WhiteNest
   layers:
   - Default
   - TransparentFX

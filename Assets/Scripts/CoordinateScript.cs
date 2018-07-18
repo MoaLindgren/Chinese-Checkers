@@ -9,7 +9,7 @@ public class CoordinateScript : MonoBehaviour
                               { -4, 13 }, { -3, 12 }, { -2, 11 }, { -1, 10 }, 
                               { 0, 9 }, 
                               { 0, 10 }, { 0, 11 }, { 0, 12 }, { 0, 13 }, 
-                              { 4, 4 }, { 5, 3 }, { 6, 2 }, { 7, 1 } },
+                              { 5, 4 }, { 6, 3 }, { 7, 2 }, { 8, 1 } },
 
            coordinates = { { 5, -1 }, { 4, -2 }, { 3, -3 }, { 2, -4 },
                            { -7, -5 }, { -6, -6 }, { -5, -7 }, { -4, -8 },
@@ -21,18 +21,25 @@ public class CoordinateScript : MonoBehaviour
     float distance;
 
     [SerializeField]
-    GameObject positions, tile;
+    GameObject positions, tile, positionsParent;
     GameObject[] tempNest;
     PositionScript positionScript;
+    MenuScript menuScript;
+    TileScript tileScript;
     Text text;
     List<string> currentColor;
     List<Color> color;
+    public List<GameObject> positionObjects;
+    [SerializeField]
+    List<GameObject> tileParents;
 
     void Start()
     {
-        numberOfPlayers = 6;
+        //menuScript = GameObject.Find("Canvas").GetComponent<MenuScript>();
+        numberOfPlayers = 2/*menuScript.numberOfPlayers*/;
         numberOfRows = 17;
         counter = 0;
+        positionObjects = new List<GameObject>();
         InstantiatePositions();
         StartCoroutine(SetBoard());
     }
@@ -49,6 +56,8 @@ public class CoordinateScript : MonoBehaviour
                 xCoord = tilesAndXCoord[i, 0] + y;
 
                 GameObject pos = Instantiate(positions, new Vector3(coordinates[i, 0] + distance, coordinates[i, 1], 1), Quaternion.identity);
+                pos.transform.parent = positionsParent.transform;
+                positionObjects.Add(pos);
                 positionScript = pos.GetComponent<PositionScript>();
                 positionScript.xPosition = xCoord;
                 positionScript.yPosition = yCoord;
@@ -58,7 +67,6 @@ public class CoordinateScript : MonoBehaviour
     }
     IEnumerator SetBoard()
     {
-
         yield return new WaitForSeconds(1);
         switch(numberOfPlayers)
         {
@@ -84,10 +92,22 @@ public class CoordinateScript : MonoBehaviour
         {
             tempNest = GameObject.FindGameObjectsWithTag(currentColor[i] + "Nest");
             foreach (GameObject position in tempNest)
-            {
+            { 
                 GameObject tempTile = Instantiate(tile, new Vector3(position.transform.position.x, position.transform.position.y, 0), Quaternion.identity);
+                position.GetComponent<PositionScript>().taken = true;
                 tempTile.tag = currentColor[i] + "Player";
                 tempTile.GetComponent<Renderer>().material.SetColor("_Color", color[i]);
+                tileScript = tempTile.GetComponent<TileScript>();
+                tileScript.SetCoords(position);
+
+                //För att strukturera upp i Unity-hierarkin:
+                foreach(GameObject parent in tileParents)
+                {
+                    if(parent.name == position.tag)
+                    {
+                        tempTile.transform.parent = parent.transform;
+                    }
+                }
             }
         }
         currentColor.Clear();

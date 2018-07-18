@@ -109,3 +109,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xPosition: 0
   yPosition: 0
+  taken: 0
+  valid: 0

@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class PositionScript : MonoBehaviour
 {
+    CalculateMoveScript calculateMoveScript;
+    CoordinateScript cordScript;
+    int numberOfPlayers;
     public int xPosition, yPosition;
+    public bool taken;
+    public bool valid;
+
     int[,] redNest =    { { 0, 0 },
                           { 1, 0 }, { 1, 1 },
                           { 2, 0 }, { 2, 1 }, { 2, 2 },
                           { 3, 0 }, { 3, 1 }, { 3, 2 }, { 3, 3 } },
-           blueNest =   { { 16, 7 },
-                          { 15, 7 }, { 15, 6 },
-                          { 14, 7 }, { 14, 6 }, { 14, 5 },
-                          { 13, 7 }, { 13, 6 }, { 13, 5 }, { 13, 4 } },
+           blueNest =   { { 16, 8 },
+                          { 15, 8 }, { 15, 7 },
+                          { 14, 8 }, { 14, 7 }, { 14, 6 },
+                          { 13, 8 }, { 13, 7 }, { 13, 6 }, { 13, 5 } },
            yellowNest = { { 4, -4 },
                           { 4, -3 }, { 5, -3 },
                           { 4, -2 }, { 5, -2 }, { 6, -2 },
@@ -32,6 +38,14 @@ public class PositionScript : MonoBehaviour
 
     void Start()
     {
+        calculateMoveScript = GameObject.Find("GameManager").GetComponent<CalculateMoveScript>();
+        taken = false;
+        valid = false;
+        SetNests();
+    }
+
+    void SetNests()
+    {
         for (int i = 0; i < 10; i++)
         {
             if (xPosition == blueNest[i, 1] && yPosition == blueNest[i, 0])
@@ -39,7 +53,7 @@ public class PositionScript : MonoBehaviour
                 GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
                 gameObject.tag = "BlueNest";
             }
-            else if(xPosition == redNest[i, 1] && yPosition == redNest[i, 0])
+            else if (xPosition == redNest[i, 1] && yPosition == redNest[i, 0])
             {
                 GetComponent<Renderer>().material.SetColor("_Color", Color.red);
                 gameObject.tag = "RedNest";
@@ -66,9 +80,15 @@ public class PositionScript : MonoBehaviour
             }
         }
     }
+
     void OnMouseDown()
     {
-        print(xPosition + ", " + yPosition);
+        if(valid)
+        {
+            calculateMoveScript.chosenTile.GetComponent<TileScript>().Move(gameObject);
+            taken = true;
+            valid = false;
+        }
     }
 
 }

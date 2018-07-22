@@ -8,8 +8,7 @@ public class PositionScript : MonoBehaviour
     CoordinateScript cordScript;
     int numberOfPlayers;
     public int xPosition, yPosition;
-    public bool taken;
-    public bool valid;
+    public bool taken, valid, jumpPosition;
 
     int[,] redNest =    { { 0, 0 },
                           { 1, 0 }, { 1, 1 },
@@ -39,11 +38,14 @@ public class PositionScript : MonoBehaviour
     void Start()
     {
         calculateMoveScript = GameObject.Find("GameManager").GetComponent<CalculateMoveScript>();
+        jumpPosition = false;
         taken = false;
         valid = false;
         SetNests();
     }
 
+    //Sätter alla "bon" till den tag de ska ha. Det här underlättar för att se vem som slutligen vinner. 
+    //Om alla bon har sin tag så kommer det vara enklare att kolla om bona är fyllda eller inte.
     void SetNests()
     {
         for (int i = 0; i < 10; i++)
@@ -83,11 +85,10 @@ public class PositionScript : MonoBehaviour
 
     void OnMouseDown()
     {
-        if(valid)
+        if(this.valid)
         {
-            calculateMoveScript.chosenTile.GetComponent<TileScript>().Move(gameObject);
+            calculateMoveScript.selectedTile.GetComponent<TileScript>().Move(gameObject, jumpPosition);
             taken = true;
-            valid = false;
         }
     }
 

@@ -5,30 +5,47 @@ using UnityEngine;
 public class CalculateMoveScript : MonoBehaviour
 {
     GameObject[] highlightArray;
-    public GameObject chosenTile;
+    public GameObject selectedTile;
     [SerializeField]
     GameObject highlight;
     CoordinateScript coordScript;
     public int[,] positionsToGo;
-    int xPos_UpLeft, yPos_UpLeft, xPos_UpRight, yPos_UpRight, xPos_DownLeft, yPos_DownLeft, xPos_DownRight, yPos_DownRight, xPos_Left, yPos_Left, xPos_Right, yPos_Right, xPos, yPos;
+    int xPos_UpLeft, 
+        yPos_UpLeft, 
+        xPos_UpRight, 
+        yPos_UpRight, 
+        xPos_DownLeft, 
+        yPos_DownLeft, 
+        xPos_DownRight, 
+        yPos_DownRight, 
+        xPos_Left, 
+        yPos_Left, 
+        xPos_Right, 
+        yPos_Right, 
+        xPos, 
+        yPos;
     [SerializeField]
-    List<GameObject> positions;
-    List<GameObject> validPositions, jumpPositions;
+    List<GameObject> positions, jumpPositions;
+    public List<GameObject> validPositions;
     bool jumpReady;
+    public bool tileSelected;
+    GameManagerScript gameManagerScript;
 
     void Start()
     {
+        gameManagerScript = GetComponent<GameManagerScript>();
         jumpPositions = new List<GameObject>();
-        coordScript = GameObject.Find("GameManager").GetComponent<CoordinateScript>();
+        coordScript = GetComponent<CoordinateScript>();
         positions = coordScript.positionObjects;
-        validPositions = new List<GameObject>();
+   //     validPositions = new List<GameObject>();
     }
 
+    //Kalkylerar positioner pjäsen kan gå till:
     public void CalculateMove(int x, int y)
     {
-        validPositions.Clear();
-        xPos = x;
+        xPos = x; //BEHÖVS DETTA ??
         yPos = y;
+
         //Räkna ut +1 och -1 på både x-värde och y-värde. 
 
         xPos_UpLeft = xPos - 1;
@@ -61,18 +78,11 @@ public class CalculateMoveScript : MonoBehaviour
         CheckExistance(xPos, yPos);
     }
 
-    public void DeleteHighlights()
-    {
-        highlightArray = GameObject.FindGameObjectsWithTag("Highlight");
-        foreach (GameObject light in highlightArray)
-        {
-            Destroy(light);
-        }
-    }
-
+    //Kollar om de positioner som kalkylerats är positioner som existerar på brädet, samt om de är upptagna eller inte.
     void CheckExistance(int xPos, int yPos)
     {
         jumpReady = false;
+        
         for (int i = 0; i < 6; i++)
         {
             for (int a = 0; a < positions.Count; a++)
@@ -85,13 +95,12 @@ public class CalculateMoveScript : MonoBehaviour
                     {
                         jumpPositions.Add(positions[a]);
                         jumpReady = true;
+
                     }
-                    else
+                    else if(gameManagerScript.movesThisTurn == 0)
                     {
-                        validPositions.Add(positions[a]); //BEHÖVS DENNA LISTA ??
-                        positions[a].GetComponent<PositionScript>().valid = true;
-                        Instantiate(highlight, new Vector3(positions[a].transform.position.x, positions[a].transform.position.y, 0), Quaternion.identity);
-                        //positions[a].GetComponent<Renderer>().material.SetColor("_Color", Color.cyan);
+                        positions[a].GetComponent<PositionScript>().jumpPosition = false;
+                        HighlightPositions(positions[a]);
                     }
                 }
             }
@@ -102,22 +111,62 @@ public class CalculateMoveScript : MonoBehaviour
         }
     }
 
+    //Resettar alla kalkyleringar som har gjorts och tar bort highlights etc.
+    public void ResetCalculations()
+    {
+        gameManagerScript.movesThisTurn = 0;
+        jumpPositions.Clear();
+        for (int i = 0; i < validPositions.Count; i++)
+        {
+            validPositions[i].GetComponent<PositionScript>().valid = false;
+            validPositions[i].GetComponent<PositionScript>().jumpPosition = false;
+        }
+        validPositions.Clear();
+        tileSelected = false;
+
+        //Tar bort highlights på positioner:
+        highlightArray = GameObject.FindGameObjectsWithTag("Highlight");
+        foreach (GameObject light in highlightArray)
+        {
+            Destroy(light);
+        }
+    }
+
+    //När en position bredvid pjäsen är upptagen så behöver ett hopp kalkyleras:
     void Jump()
     {
+        for (int i = 0; i < jumpPositions.Count; i++)
+        {
+            int xDif = xPos - jumpPositions[i].GetComponent<PositionScript>().xPosition;
+            int yDif = yPos - jumpPositions[i].GetComponent<PositionScript>().yPosition;
 
-        //print("wiho");
-        //int xDif = xPos - jumpPositions[i].GetComponent<PositionScript>().xPosition;
-        //int yDif = yPos - jumpPositions[i].GetComponent<PositionScript>().yPosition;
+            int jump_xPos = jumpPositions[i].GetComponent<PositionScript>().xPosition - xDif;
+            int jump_yPos = jumpPositions[i].GetComponent<PositionScript>().yPosition - yDif;
 
-        //int jump_xPos = jumpPositions[i].GetComponent<PositionScript>().xPosition - xDif;
-        //int jump_yPos = jumpPositions[i].GetComponent<PositionScript>().yPosition - yDif;
-        //CheckExistance(jump_xPos, jump_yPos);
+            for (int a = 0; a < positions.Count; a++)
+            {
+                if (jump_xPos == positions[a].GetComponent<PositionScript>().xPosition
+                    && jump_yPos == positions[a].GetComponent<PositionScript>().yPosition)
+                {
+                    if(positions[a].GetComponent<PositionScript>().taken == false)
+                    {
+                        positions[a].GetComponent<PositionScript>().jumpPosition = true;
+                        HighlightPositions(positions[a]);
+                    }
+                }
+            }
+        }
+    }
 
-        //jumpPositions.Clear();
-
-
-        ////yield return new WaitForSeconds(1);
-        ////CheckExistance(jump_xPos, jump_yPos);
+    //Sätter positioner som är möjliga att gå till till Valid och Highlightar dom:
+    void HighlightPositions(GameObject pos)
+    {
+        validPositions.Add(pos);
+        if(pos.GetComponent<PositionScript>().valid == false)
+        {
+            Instantiate(highlight, new Vector3(pos.transform.position.x, pos.transform.position.y, 0), Quaternion.identity);
+        }
+        pos.GetComponent<PositionScript>().valid = true;
     }
 
 }

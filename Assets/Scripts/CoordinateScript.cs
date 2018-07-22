@@ -24,7 +24,6 @@ public class CoordinateScript : MonoBehaviour
     GameObject positions, tile, positionsParent;
     GameObject[] tempNest;
     PositionScript positionScript;
-    MenuScript menuScript;
     TileScript tileScript;
     Text text;
     List<string> currentColor;
@@ -32,17 +31,18 @@ public class CoordinateScript : MonoBehaviour
     public List<GameObject> positionObjects;
     [SerializeField]
     List<GameObject> tileParents;
+    GameManagerScript gameManagerScript;
 
     void Start()
     {
-        //menuScript = GameObject.Find("Canvas").GetComponent<MenuScript>();
-        numberOfPlayers = 2/*menuScript.numberOfPlayers*/;
+        gameManagerScript = GetComponent<GameManagerScript>();
         numberOfRows = 17;
         counter = 0;
         positionObjects = new List<GameObject>();
         InstantiatePositions();
         StartCoroutine(SetBoard());
     }
+    //Instansierar positioner:
     void InstantiatePositions()
     {
         for (int i = 0; i < numberOfRows; i++)
@@ -65,10 +65,14 @@ public class CoordinateScript : MonoBehaviour
             }
         }
     }
+
+    //Placerar ut pjäser beroende på hur många spelare det är:
     IEnumerator SetBoard()
     {
+
         yield return new WaitForSeconds(1);
-        switch(numberOfPlayers)
+        numberOfPlayers = gameManagerScript.numberOfPlayers;
+        switch (numberOfPlayers)
         {
             case 2:
                 currentColor = new List<string>() { "Red", "Blue" };

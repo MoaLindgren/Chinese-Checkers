@@ -2,62 +2,81 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Följande script räknar på positioner som spelaren och Ain kan gå till. 
+
 public class CalculateMoveScript : MonoBehaviour
 {
-    GameObject[] highlightArray;
-    public GameObject selectedTile;
-    [SerializeField]
-    GameObject highlight;
-    CoordinateScript coordScript;
+    #region ints
     public int[,] positionsToGo;
-    int xPos_UpLeft, 
-        yPos_UpLeft, 
-        xPos_UpRight, 
-        yPos_UpRight, 
-        xPos_DownLeft, 
-        yPos_DownLeft, 
-        xPos_DownRight, 
-        yPos_DownRight, 
-        xPos_Left, 
-        yPos_Left, 
-        xPos_Right, 
-        yPos_Right, 
-        xPos, 
+    int xPos_UpLeft,
+        yPos_UpLeft,
+        xPos_UpRight,
+        yPos_UpRight,
+        xPos_DownLeft,
+        yPos_DownLeft,
+        xPos_DownRight,
+        yPos_DownRight,
+        xPos_Left,
+        yPos_Left,
+        xPos_Right,
+        yPos_Right,
+        xPos,
         yPos;
+    #endregion
+    #region GameObjects
+
     [SerializeField]
     List<GameObject> positions, jumpPositions;
     public List<GameObject> validPositions;
-    bool jumpReady;
-    public bool tileSelected;
-    GameManagerScript gameManagerScript;
 
+    GameObject[] highlightArray;
+
+    [SerializeField]
+    GameObject highlight, currentTile;
+    public GameObject selectedTile;
+
+    #endregion
+    #region bools
+    bool jumpReady, playerTurn;
+    public bool tileSelected;
+    #endregion
+    #region Scripts
+    GameManagerScript gameManagerScript;
+    CoordinateScript coordScript;
+    XmlScript xmlScript;
+    NpcScript npcScript;
+    #endregion
+
+    //Hämtar script och eventuella startvärden:
     void Start()
     {
+        xmlScript = GetComponent<XmlScript>();
         gameManagerScript = GetComponent<GameManagerScript>();
+        npcScript = GetComponent<NpcScript>();
         jumpPositions = new List<GameObject>();
         coordScript = GetComponent<CoordinateScript>();
         positions = coordScript.positionObjects;
-   //     validPositions = new List<GameObject>();
     }
 
     //Kalkylerar positioner pjäsen kan gå till:
-    public void CalculateMove(int x, int y)
+    public void CalculateMove(int x, int y, bool turn, GameObject tile)
     {
-        xPos = x; //BEHÖVS DETTA ??
+        currentTile = tile;
+        playerTurn = turn;
+        xPos = x;
         yPos = y;
 
-        //Räkna ut +1 och -1 på både x-värde och y-värde. 
+        //Räknar ut +1 och -1 på både x-värde och y-värde: 
+        #region Calculation
 
         xPos_UpLeft = xPos - 1;
         yPos_UpLeft = yPos - 1;
-
 
         xPos_UpRight = xPos;
         yPos_UpRight = yPos - 1;
 
         xPos_DownLeft = xPos;
         yPos_DownLeft = yPos + 1;
-
 
         xPos_DownRight = xPos + 1;
         yPos_DownRight = yPos + 1;
@@ -74,6 +93,7 @@ public class CalculateMoveScript : MonoBehaviour
                                      { xPos_DownRight, yPos_DownRight },
                                      { xPos_Left, yPos_Left },
                                      { xPos_Right, yPos_Right } };
+        #endregion
 
         CheckExistance(xPos, yPos);
     }
@@ -82,27 +102,34 @@ public class CalculateMoveScript : MonoBehaviour
     void CheckExistance(int xPos, int yPos)
     {
         jumpReady = false;
-        
-        for (int i = 0; i < 6; i++)
+
+        for (int i = 0; i < positionsToGo.Length / 2; i++)
         {
             for (int a = 0; a < positions.Count; a++)
             {
-                if (positionsToGo[i, 0] == positions[a].GetComponent<PositionScript>().xPosition
-                    && positionsToGo[i, 1] == positions[a].GetComponent<PositionScript>().yPosition)
+                if (positionsToGo[i, 0] == positions[a].GetComponent<PositionScript>().xPosition && 
+                    positionsToGo[i, 1] == positions[a].GetComponent<PositionScript>().yPosition)
                 {
-                    //Hopp:
+                    //Om en närliggande position är upptagen, så kan pjäsen hoppa över denna.
                     if (positions[a].GetComponent<PositionScript>().taken == true)
                     {
                         jumpPositions.Add(positions[a]);
                         jumpReady = true;
-
                     }
-                    else if(gameManagerScript.movesThisTurn == 0)
+                    //Om närliggande pjäs inte är upptagen så:
+                    else if (gameManagerScript.movesThisTurn == 0)
                     {
                         positions[a].GetComponent<PositionScript>().jumpPosition = false;
-                        HighlightPositions(positions[a]);
-                    }
+                        if (playerTurn)
+                        {
+                            HighlightPositions(positions[a]);
+                        }
+                        else
+                        {
+                            xmlScript.SavePotentialMoves(currentTile, positions[a]);
+                        }
                 }
+            }
             }
         }
         if (jumpReady)
@@ -148,10 +175,19 @@ public class CalculateMoveScript : MonoBehaviour
                 if (jump_xPos == positions[a].GetComponent<PositionScript>().xPosition
                     && jump_yPos == positions[a].GetComponent<PositionScript>().yPosition)
                 {
-                    if(positions[a].GetComponent<PositionScript>().taken == false)
+                    if (positions[a].GetComponent<PositionScript>().taken == false)
                     {
                         positions[a].GetComponent<PositionScript>().jumpPosition = true;
-                        HighlightPositions(positions[a]);
+                        if (playerTurn)
+                        {
+                            HighlightPositions(positions[a]);
+                        }
+                        else
+                        {
+
+                            xmlScript.SavePotentialMoves(currentTile, positions[a]);
+                        }
+
                     }
                 }
             }
@@ -162,9 +198,9 @@ public class CalculateMoveScript : MonoBehaviour
     void HighlightPositions(GameObject pos)
     {
         validPositions.Add(pos);
-        if(pos.GetComponent<PositionScript>().valid == false)
+        if (pos.GetComponent<PositionScript>().valid == false)
         {
-            Instantiate(highlight, new Vector3(pos.transform.position.x, pos.transform.position.y, 0), Quaternion.identity);
+            Instantiate(highlight, new Vector3(pos.transform.position.x, pos.transform.position.y, 0.9f), Quaternion.identity);
         }
         pos.GetComponent<PositionScript>().valid = true;
     }

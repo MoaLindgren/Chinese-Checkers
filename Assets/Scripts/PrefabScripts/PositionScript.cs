@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Följande script sitter på varje position på brädet, och hanterar det som angår positionerna.
+
 public class PositionScript : MonoBehaviour
 {
-    CalculateMoveScript calculateMoveScript;
-    CoordinateScript cordScript;
+    #region ints
     int numberOfPlayers;
     public int xPosition, yPosition;
-    public bool taken, valid, jumpPosition;
 
     int[,] redNest =    { { 0, 0 },
                           { 1, 0 }, { 1, 1 },
@@ -34,7 +34,16 @@ public class PositionScript : MonoBehaviour
                           { 4, 7 }, { 5, 8 },
                           { 4, 6 }, { 5, 7 }, { 6, 8 },
                           { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 8 } };
+    #endregion
+    #region bools
+    public bool taken, valid, jumpPosition;
+    #endregion
+    #region Scripts
+    CalculateMoveScript calculateMoveScript;
+    CoordinateScript coordinateScript;
+    #endregion
 
+    //Start sätter och hämtar startvärden
     void Start()
     {
         calculateMoveScript = GameObject.Find("GameManager").GetComponent<CalculateMoveScript>();
@@ -44,8 +53,8 @@ public class PositionScript : MonoBehaviour
         SetNests();
     }
 
-    //Sätter alla "bon" till den tag de ska ha. Det här underlättar för att se vem som slutligen vinner. 
-    //Om alla bon har sin tag så kommer det vara enklare att kolla om bona är fyllda eller inte.
+    //Sätter alla "bon" till den Tagg de ska ha. Det här underlättar för att se vem som slutligen vinner. 
+    //Om alla bon har sin tagg så kommer det vara enklare att kolla om bona är fyllda eller inte.
     void SetNests()
     {
         for (int i = 0; i < 10; i++)
@@ -83,6 +92,7 @@ public class PositionScript : MonoBehaviour
         }
     }
 
+    //Om man klickar på en position, och den är Valid (dvs. pjäsen kan gå dit), så kommer pjäsen att gå dit.
     void OnMouseDown()
     {
         if(this.valid)

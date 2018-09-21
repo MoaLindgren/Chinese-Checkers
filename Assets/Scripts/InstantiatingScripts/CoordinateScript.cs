@@ -3,74 +3,93 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+//Följande script sätter upp brädet med dess koordinater.
+
 public class CoordinateScript : MonoBehaviour
 {
-    int[,] tilesAndXCoord = { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 0, 4 }, 
-                              { -4, 13 }, { -3, 12 }, { -2, 11 }, { -1, 10 }, 
-                              { 0, 9 }, 
-                              { 0, 10 }, { 0, 11 }, { 0, 12 }, { 0, 13 }, 
-                              { 5, 4 }, { 6, 3 }, { 7, 2 }, { 8, 1 } },
+    #region ints and floats
+    int[,] xCoordAndTiles = { { 0, 1 }, { 0, 2 }, { -1, 3 }, { -1, 4 }, 
+                              { -6, 13 }, { -5, 12 }, { -5, 11 }, { -4, 10 }, 
+                              { -4, 9 }, 
+                              { -4, 10 }, { -5, 11 }, { -5, 12 }, { -6, 13 }, 
+                              { -1, 4 }, { -1, 3 }, { 0, 2 }, { 0, 1 } },
 
-           coordinates = { { 5, -1 }, { 4, -2 }, { 3, -3 }, { 2, -4 },
+           locationInWorld = { { 5, -1 }, { 4, -2 }, { 3, -3 }, { 2, -4 },
                            { -7, -5 }, { -6, -6 }, { -5, -7 }, { -4, -8 },
                            { -3, -9 },
                            { -4, -10 }, { -5, -11 }, { -6, -12 }, { -7, -13 },
                            { 2, -14 }, { 3, -15 }, { 4, -16 }, { 5, -17 } };
 
-    int xCoord, yCoord, numberOfRows, counter, numberOfPlayers;
+    int xCoord, yCoord, lowestYCoord, posCounter, tileCounter, numberOfPlayers, rowCounter;
     float distance;
-
+    #endregion
+    #region GameObjects
     [SerializeField]
     GameObject positions, tile, positionsParent;
     GameObject[] tempNest;
-    PositionScript positionScript;
-    TileScript tileScript;
-    Text text;
-    List<string> currentColor;
-    List<Color> color;
     public List<GameObject> positionObjects;
     [SerializeField]
     List<GameObject> tileParents;
+    #endregion
+    #region Scrtips
     GameManagerScript gameManagerScript;
+    PositionScript positionScript;
+    TileScript tileScript;
+    #endregion
 
+    List<Color> color;
+    Text text;
+    bool finished;
+    List<string> currentColor;
+
+    //Följande sätter och hämtar startvärden:
     void Start()
     {
+        lowestYCoord = -16;
+        posCounter = 0;
+        tileCounter = 0;
+        rowCounter = 0;
+
         gameManagerScript = GetComponent<GameManagerScript>();
-        numberOfRows = 17;
-        counter = 0;
         positionObjects = new List<GameObject>();
+
         InstantiatePositions();
         StartCoroutine(SetBoard());
     }
+
     //Instansierar positioner:
     void InstantiatePositions()
     {
-        for (int i = 0; i < numberOfRows; i++)
+        for (int i = 8; i > lowestYCoord; i--)
         {
+            print(i);
             yCoord = i;
+
             distance = 0;
-            for (int y = 0; y < tilesAndXCoord[i, 1]; y++)
+            for (int y = 0; y < xCoordAndTiles[rowCounter, 1]; y++)
             {
                 distance = distance + 2;
-                counter = counter + 1;
-                xCoord = tilesAndXCoord[i, 0] + y;
+                posCounter = posCounter + 1;
+                xCoord = xCoordAndTiles[rowCounter, 0] + y;
 
-                GameObject pos = Instantiate(positions, new Vector3(coordinates[i, 0] + distance, coordinates[i, 1], 1), Quaternion.identity);
+                GameObject pos = Instantiate(positions, new Vector3(locationInWorld[rowCounter, 0] + distance, locationInWorld[rowCounter, 1], 1), Quaternion.Euler(new Vector3(-180, 90, -90))/*Quaternion.identity*/);
                 pos.transform.parent = positionsParent.transform;
                 positionObjects.Add(pos);
                 positionScript = pos.GetComponent<PositionScript>();
                 positionScript.xPosition = xCoord;
                 positionScript.yPosition = yCoord;
-                pos.name = "Position_" + counter + ": (" + yCoord + ", " + xCoord + ")";
+                pos.name = "Position_" + posCounter;
             }
+
+            rowCounter = rowCounter + 1;
         }
+        finished = true;
     }
 
     //Placerar ut pjäser beroende på hur många spelare det är:
     IEnumerator SetBoard()
     {
-
-        yield return new WaitForSeconds(1);
+        yield return new WaitUntil(() => finished == true);
         numberOfPlayers = gameManagerScript.numberOfPlayers;
         switch (numberOfPlayers)
         {
@@ -94,11 +113,14 @@ public class CoordinateScript : MonoBehaviour
 
         for(int i = 0; i < currentColor.Count; i++)
         {
+            tileCounter = 0;
             tempNest = GameObject.FindGameObjectsWithTag(currentColor[i] + "Nest");
             foreach (GameObject position in tempNest)
-            { 
+            {
+                tileCounter = tileCounter + 1;
                 GameObject tempTile = Instantiate(tile, new Vector3(position.transform.position.x, position.transform.position.y, 0), Quaternion.identity);
                 position.GetComponent<PositionScript>().taken = true;
+                tempTile.name = currentColor[i] + "Player" + "_" + tileCounter;
                 tempTile.tag = currentColor[i] + "Player";
                 tempTile.GetComponent<Renderer>().material.SetColor("_Color", color[i]);
                 tileScript = tempTile.GetComponent<TileScript>();

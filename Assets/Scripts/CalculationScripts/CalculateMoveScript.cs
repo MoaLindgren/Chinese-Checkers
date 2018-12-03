@@ -95,11 +95,29 @@ public class CalculateMoveScript : MonoBehaviour
                                      { xPos_Right, yPos_Right } };
         #endregion
 
-        CheckExistance(xPos, yPos);
+        //CheckExistance(xPos, yPos);
     }
 
-    //Kollar om de positioner som kalkylerats är positioner som existerar på brädet, samt om de är upptagna eller inte.
-    void CheckExistance(int xPos, int yPos)
+
+    void CheckNeighbours(int xPos, int yPos)
+    {
+        for (int i = 0; i < positionsToGo.Length / 2; i++)
+        {
+            for (int a = 0; a < positions.Count; a++)
+            {
+                if (positionsToGo[i, 0] == positions[a].GetComponent<PositionScript>().xPosition &&
+                    positionsToGo[i, 1] == positions[a].GetComponent<PositionScript>().yPosition)
+                {
+                    
+   
+                }
+            }
+        }
+    }
+
+
+        //Kollar om de positioner som kalkylerats är positioner som existerar på brädet, samt om de är upptagna eller inte.
+        void CheckExistance(int xPos, int yPos)
     {
         jumpReady = false;
 

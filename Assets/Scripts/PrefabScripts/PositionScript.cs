@@ -45,6 +45,7 @@ public class PositionScript : MonoBehaviour
 
     GameObject gameManager;
     List<GameObject> positionObjects;
+    public List<GameObject> neighbours;
 
     //Start sätter och hämtar startvärden
     void Start()
@@ -55,7 +56,7 @@ public class PositionScript : MonoBehaviour
         jumpPosition = false;
         taken = false;
         valid = false;
-        SetNests();
+        StartCoroutine(SetNests());
     }
     void Update()
     {
@@ -67,41 +68,48 @@ public class PositionScript : MonoBehaviour
 
     //Sätter alla "bon" till den Tagg de ska ha. Det här underlättar för att se vem som slutligen vinner. 
     //Om alla bon har sin tagg så kommer det vara enklare att kolla om bona är fyllda eller inte.
-    void SetNests()
+    IEnumerator SetNests()
     {
-        for (int i = 0; i < 10; i++)
+        yield return new WaitUntil(() => coordinateScript.boardChecked == true);
+        if (neighbours.Count == 2)
         {
-            if (xPosition == blueNest[i, 1] && yPosition == blueNest[i, 0])
-            {
-                GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
-                gameObject.tag = "BlueNest";
-            }
-            else if (xPosition == redNest[i, 1] && yPosition == redNest[i, 0])
-            {
-                GetComponent<Renderer>().material.SetColor("_Color", Color.red);
-                gameObject.tag = "RedNest";
-            }
-            else if (xPosition == yellowNest[i, 1] && yPosition == yellowNest[i, 0])
-            {
-                GetComponent<Renderer>().material.SetColor("_Color", Color.yellow);
-                gameObject.tag = "YellowNest";
-            }
-            else if (xPosition == greenNest[i, 1] && yPosition == greenNest[i, 0])
-            {
-                GetComponent<Renderer>().material.SetColor("_Color", Color.green);
-                gameObject.tag = "GreenNest";
-            }
-            else if (xPosition == blackNest[i, 1] && yPosition == blackNest[i, 0])
-            {
-                GetComponent<Renderer>().material.SetColor("_Color", Color.black);
-                gameObject.tag = "BlackNest";
-            }
-            else if (xPosition == whiteNest[i, 1] && yPosition == whiteNest[i, 0])
-            {
-                GetComponent<Renderer>().material.SetColor("_Color", Color.white);
-                gameObject.tag = "WhiteNest";
-            }
+            print(gameObject.name);
         }
+
+
+        //for (int i = 0; i < 10; i++)
+        //{
+        //    if (xPosition == blueNest[i, 1] && yPosition == blueNest[i, 0])
+        //    {
+        //        GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
+        //        gameObject.tag = "BlueNest";
+        //    }
+        //    else if (xPosition == redNest[i, 1] && yPosition == redNest[i, 0])
+        //    {
+        //        GetComponent<Renderer>().material.SetColor("_Color", Color.red);
+        //        gameObject.tag = "RedNest";
+        //    }
+        //    else if (xPosition == yellowNest[i, 1] && yPosition == yellowNest[i, 0])
+        //    {
+        //        GetComponent<Renderer>().material.SetColor("_Color", Color.yellow);
+        //        gameObject.tag = "YellowNest";
+        //    }
+        //    else if (xPosition == greenNest[i, 1] && yPosition == greenNest[i, 0])
+        //    {
+        //        GetComponent<Renderer>().material.SetColor("_Color", Color.green);
+        //        gameObject.tag = "GreenNest";
+        //    }
+        //    else if (xPosition == blackNest[i, 1] && yPosition == blackNest[i, 0])
+        //    {
+        //        GetComponent<Renderer>().material.SetColor("_Color", Color.black);
+        //        gameObject.tag = "BlackNest";
+        //    }
+        //    else if (xPosition == whiteNest[i, 1] && yPosition == whiteNest[i, 0])
+        //    {
+        //        GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+        //        gameObject.tag = "WhiteNest";
+        //    }
+        //}
     }
 
     void GetPositionStats()

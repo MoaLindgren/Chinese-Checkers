@@ -41,6 +41,9 @@ public class CoordinateScript : MonoBehaviour
     Text text;
     public bool finished;
     List<string> currentColor;
+    [SerializeField]
+    List<GameObject> neighbours;
+    public bool boardChecked;
 
     //Följande sätter och hämtar startvärden:
     void Start()
@@ -53,6 +56,9 @@ public class CoordinateScript : MonoBehaviour
 
         gameManagerScript = GetComponent<GameManagerScript>();
         positionObjects = new List<GameObject>();
+        neighbours = new List<GameObject>();
+
+        boardChecked = false;
 
         InstantiatePositions();
         StartCoroutine(SetBoard());
@@ -141,5 +147,60 @@ public class CoordinateScript : MonoBehaviour
             }
         }
         currentColor.Clear();
+        CheckBoard();
     }
+
+    void CheckBoard()
+    {
+        for(int i = 0; i < positionObjects.Count; i++)
+        {
+
+            int x = positionObjects[i].GetComponent<PositionScript>().xPosition;
+            int y = positionObjects[i].GetComponent<PositionScript>().yPosition;
+
+
+            //Räknar ut vart grannar kan finnas: 
+
+            int xPos_UpLeft = x;
+            int yPos_UpLeft = y + 1;
+
+            int xPos_UpRight = x + 1;
+            int yPos_UpRight = y + 1;
+
+            int xPos_DownLeft = x;
+            int yPos_DownLeft = y - 1;
+
+            int xPos_DownRight = x + 1;
+            int yPos_DownRight = y - 1;
+
+            int xPos_Left = x - 1;
+            int yPos_Left = y;
+
+            int xPos_Right = x + 1;
+            int yPos_Right = y;
+
+            int [,] potentialNeighbour = new int[,] { { xPos_UpLeft, yPos_UpLeft },
+                                     { xPos_UpRight, yPos_UpRight },
+                                     { xPos_DownLeft, yPos_DownLeft },
+                                     { xPos_DownRight, yPos_DownRight },
+                                     { xPos_Left, yPos_Left },
+                                     { xPos_Right, yPos_Right } };
+
+
+            for (int z = 0; z < potentialNeighbour.GetLength(0); z++)
+            {
+                for (int a = 0; a < positionObjects.Count; a++)
+                {
+                    if (potentialNeighbour[z, 0] == positionObjects[a].GetComponent<PositionScript>().xPosition &&
+                        potentialNeighbour[z, 1] == positionObjects[a].GetComponent<PositionScript>().yPosition)
+                    {
+                        positionObjects[i].GetComponent<PositionScript>().neighbours.Add(positionObjects[a]);
+                    }
+                }
+            }
+
+        }
+        boardChecked = true;
+    }
+
 }

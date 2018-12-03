@@ -20,7 +20,7 @@ public class CoordinateScript : MonoBehaviour
                            { -4, -10 }, { -5, -11 }, { -6, -12 }, { -7, -13 },
                            { 2, -14 }, { 3, -15 }, { 4, -16 }, { 5, -17 } };
 
-    int xCoord, yCoord, lowestYCoord, posCounter, tileCounter, numberOfPlayers, rowCounter;
+    int xCoord, yCoord, lowestYCoord, posCounter, tileCounter, numberOfPlayers, rowCounter, offSet;
     float distance;
     #endregion
     #region GameObjects
@@ -39,16 +39,17 @@ public class CoordinateScript : MonoBehaviour
 
     List<Color> color;
     Text text;
-    bool finished;
+    public bool finished;
     List<string> currentColor;
 
     //Följande sätter och hämtar startvärden:
     void Start()
     {
-        lowestYCoord = -16;
+        lowestYCoord = -8;
         posCounter = 0;
         tileCounter = 0;
         rowCounter = 0;
+        offSet = 2;
 
         gameManagerScript = GetComponent<GameManagerScript>();
         positionObjects = new List<GameObject>();
@@ -60,27 +61,30 @@ public class CoordinateScript : MonoBehaviour
     //Instansierar positioner:
     void InstantiatePositions()
     {
-        for (int i = 8; i > lowestYCoord; i--)
+        for (int i = 8; i >= lowestYCoord; i--)
         {
-            print(i);
             yCoord = i;
-
             distance = 0;
             for (int y = 0; y < xCoordAndTiles[rowCounter, 1]; y++)
             {
-                distance = distance + 2;
-                posCounter = posCounter + 1;
+                distance = distance + offSet;
                 xCoord = xCoordAndTiles[rowCounter, 0] + y;
 
-                GameObject pos = Instantiate(positions, new Vector3(locationInWorld[rowCounter, 0] + distance, locationInWorld[rowCounter, 1], 1), Quaternion.Euler(new Vector3(-180, 90, -90))/*Quaternion.identity*/);
-                pos.transform.parent = positionsParent.transform;
-                positionObjects.Add(pos);
+                GameObject pos = Instantiate(positions, new Vector3(locationInWorld[rowCounter, 0] + distance, 
+                                                                    locationInWorld[rowCounter, 1], 1), 
+                                                                    Quaternion.Euler(new Vector3(-180, 90, -90)));
+
                 positionScript = pos.GetComponent<PositionScript>();
                 positionScript.xPosition = xCoord;
                 positionScript.yPosition = yCoord;
+                
+                positionObjects.Add(pos);
+
+                //För ordning i hierarkin i Unity:
+                pos.transform.parent = positionsParent.transform;
+                posCounter = posCounter + 1; //Endast för namngivningen nedan.
                 pos.name = "Position_" + posCounter;
             }
-
             rowCounter = rowCounter + 1;
         }
         finished = true;

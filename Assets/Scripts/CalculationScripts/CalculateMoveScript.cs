@@ -43,14 +43,14 @@ public class CalculateMoveScript : MonoBehaviour
     #region Scripts
     GameManagerScript gameManagerScript;
     CoordinateScript coordScript;
-    XmlScript xmlScript;
+   // XmlScript xmlScript;
     NpcScript npcScript;
     #endregion
 
     //Hämtar script och eventuella startvärden:
     void Start()
     {
-        xmlScript = GetComponent<XmlScript>();
+        //xmlScript = GetComponent<XmlScript>();
         gameManagerScript = GetComponent<GameManagerScript>();
         npcScript = GetComponent<NpcScript>();
         jumpPositions = new List<GameObject>();
@@ -126,7 +126,7 @@ public class CalculateMoveScript : MonoBehaviour
                         }
                         else
                         {
-                            xmlScript.SavePotentialMoves(currentTile, positions[a]);
+                            //xmlScript.SavePotentialMoves(currentTile, positions[a]);
                         }
                 }
             }
@@ -185,7 +185,7 @@ public class CalculateMoveScript : MonoBehaviour
                         else
                         {
 
-                            xmlScript.SavePotentialMoves(currentTile, positions[a]);
+                            //xmlScript.SavePotentialMoves(currentTile, positions[a]);
                         }
 
                     }

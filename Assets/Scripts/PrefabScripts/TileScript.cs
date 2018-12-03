@@ -11,7 +11,7 @@ public class TileScript : MonoBehaviour
     public int myXCoord, myYCoord;
     #endregion
     #region GameObjects
-    GameObject myPostionObject, gameManager, button;
+    GameObject myPostionObject, gameManager/*, button*/;
     #endregion
     #region Scripts
     CalculateMoveScript calculateMoveScript;
@@ -32,7 +32,7 @@ public class TileScript : MonoBehaviour
         gameManager = GameObject.Find("GameManager");
         calculateMoveScript = gameManager.GetComponent<CalculateMoveScript>();
         gameManagerScript = gameManager.GetComponent<GameManagerScript>();
-        button = GameObject.Find("Canvas").transform.GetChild(1).gameObject;
+        //button = GameObject.Find("Canvas").transform.GetChild(1).gameObject;
     }
 
     //När spelaren klickar på en blå pjäs så sker följande:      
@@ -51,10 +51,10 @@ public class TileScript : MonoBehaviour
     {
         //Här bör en check för om spelaren som just nu har lagt sin pjäs vann eller inte implementeras.
 
-        if (gameManagerScript.playerTurn)
-        {
-            button.SetActive(true);
-        }
+        //if (gameManagerScript.playerTurn)
+        //{
+        //    button.SetActive(true);
+        //}
         calculateMoveScript.ResetCalculations();
         this.tileSelected = false;
         newPosition.GetComponent<PositionScript>().taken = true;

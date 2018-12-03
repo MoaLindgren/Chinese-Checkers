@@ -23,7 +23,7 @@ public class GameManagerScript : MonoBehaviour
     NpcScript npcScript;
     #endregion
     #region GameObjects
-    GameObject canvas, button;
+   // GameObject canvas, button;
     #endregion
     #region UI
     Text turnText;
@@ -32,15 +32,15 @@ public class GameManagerScript : MonoBehaviour
     //Hämtar och sätter startvärden:
     void Start()
     {
-        canvas = GameObject.Find("Canvas");
-        button = canvas.transform.GetChild(1).gameObject;
-        button.SetActive(false);
-        turnText = canvas.transform.GetChild(0).GetComponent<Text>();
+        //canvas = GameObject.Find("Canvas");
+        //button = canvas.transform.GetChild(1).gameObject;
+        //button.SetActive(false);
+        //turnText = canvas.transform.GetChild(0).GetComponent<Text>();
 
         calculateMoveScript = GetComponent<CalculateMoveScript>();
         npcScript = GetComponent<NpcScript>();
-        menuScript = canvas.GetComponent<MenuScript>();
-        numberOfPlayers = menuScript.numberOfPlayers;
+       // menuScript = canvas.GetComponent<MenuScript>();
+        numberOfPlayers = 2 /*menuScript.numberOfPlayers*/;
 
         playerIndex = 0;
         playerTurn = true;

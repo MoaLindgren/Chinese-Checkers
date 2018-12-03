@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -348,6 +348,7 @@ MonoBehaviour:
   - {fileID: 267506093}
   - {fileID: 973991754}
   - {fileID: 1063331042}
+  finished: 0
 --- !u!114 &938705438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -399,11 +400,22 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 938705435}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f21366ffb3d22bf4194c6bddf0c08bcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  filePath: 
+  x: 0
+  y: 0
+  foundPosition: 0
+  moved: 0
+  path: {fileID: 0}
+  tileToMove: {fileID: 0}
+  goToPosition: {fileID: 0}
+  npcScript: {fileID: 0}
+  gameManagerScript: {fileID: 0}
+  calculateMoveScript: {fileID: 0}
 --- !u!1 &956091201
 GameObject:
   m_ObjectHideFlags: 0

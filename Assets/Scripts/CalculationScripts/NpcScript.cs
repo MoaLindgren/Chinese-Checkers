@@ -23,7 +23,7 @@ public class NpcScript : MonoBehaviour
     bool finished;
     #endregion
     #region Scripts
-    XmlScript xmlScript;
+    //XmlScript xmlScript;
     CalculateMoveScript calculateMoveScript;
     GameManagerScript gameManagerScript;
     #endregion
@@ -35,7 +35,7 @@ public class NpcScript : MonoBehaviour
         opponentCoordinates = new int[10, 10];
         calculateMoveScript = GetComponent<CalculateMoveScript>();
         gameManagerScript = GetComponent<GameManagerScript>();
-        xmlScript = GetComponent<XmlScript>();
+        //xmlScript = GetComponent<XmlScript>();
     }
 
     //Följande metod blir kallad på från GameManagerScript (Metod: TurnManager()). Den ser till så att det är rätt oppnent vid rätt spelares tur.
@@ -98,7 +98,7 @@ public class NpcScript : MonoBehaviour
             }
         }
         yield return new WaitUntil(() => finished == true);
-        xmlScript.CalculateBestMove(direction, npcTiles, opponentCoordinates);
+        //xmlScript.CalculateBestMove(direction, npcTiles, opponentCoordinates);
     }
 }
 

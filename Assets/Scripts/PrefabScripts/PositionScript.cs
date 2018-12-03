@@ -43,14 +43,26 @@ public class PositionScript : MonoBehaviour
     CoordinateScript coordinateScript;
     #endregion
 
+    GameObject gameManager;
+    List<GameObject> positionObjects;
+
     //Start sätter och hämtar startvärden
     void Start()
     {
-        calculateMoveScript = GameObject.Find("GameManager").GetComponent<CalculateMoveScript>();
+        gameManager = GameObject.Find("GameManager");
+        calculateMoveScript = gameManager.GetComponent<CalculateMoveScript>();
+        coordinateScript = gameManager.GetComponent<CoordinateScript>();
         jumpPosition = false;
         taken = false;
         valid = false;
         SetNests();
+    }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            GetPositionStats();
+        }
     }
 
     //Sätter alla "bon" till den Tagg de ska ha. Det här underlättar för att se vem som slutligen vinner. 
@@ -91,6 +103,19 @@ public class PositionScript : MonoBehaviour
             }
         }
     }
+
+    void GetPositionStats()
+    {
+        if(coordinateScript.finished)
+        {
+            positionObjects = coordinateScript.positionObjects;
+            foreach (GameObject pos in positionObjects)
+            {
+                print("heyo");
+            }
+        }
+    }
+
 
     //Om man klickar på en position, och den är Valid (dvs. pjäsen kan gå dit), så kommer pjäsen att gå dit.
     void OnMouseDown()

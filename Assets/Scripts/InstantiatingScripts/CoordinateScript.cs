@@ -158,7 +158,6 @@ public class CoordinateScript : MonoBehaviour
             int x = positionObjects[i].GetComponent<PositionScript>().xPosition;
             int y = positionObjects[i].GetComponent<PositionScript>().yPosition;
 
-
             //Räknar ut vart grannar kan finnas: 
 
             int xPos_UpLeft = x;

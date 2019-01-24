@@ -17,10 +17,13 @@ public class InstantiateBoard : MonoBehaviour
     [SerializeField]
     GameObject tilePrefab;
     List<GameObject> allTiles;
+    List<int> xValues, yValues;
 
     void Start()
     {
         allTiles = new List<GameObject>();
+        xValues = new List<int>();
+        yValues = new List<int>();
         switchRow = true;
         count = 0;
         tileCoordValues = new int[,] { { 0, 1 },
@@ -50,7 +53,7 @@ public class InstantiateBoard : MonoBehaviour
             y = i;
 
             //Varannan rad behöver en offset för x-positionerna:
-            if(switchRow)
+            if (switchRow)
             {
                 offSetValue = 0.5f;
             }
@@ -69,10 +72,54 @@ public class InstantiateBoard : MonoBehaviour
                 allTiles.Add(tile);
                 tile.transform.eulerAngles = new Vector3(0, -90, 90);
                 tile.name = count.ToString();
-                tile.GetComponent<NewTileScript>().SetMyPosition(x, y, switchRow, allTiles);
+                tile.GetComponent<NewTileScript>().SetMyPosition(x, y, switchRow);
             }
         }
-        
+
+        foreach(GameObject tile in allTiles)
+        {
+            xValues.Clear();
+            yValues.Clear();
+            int tileX = tile.GetComponent<NewTileScript>().x;
+            int tileY = tile.GetComponent<NewTileScript>().y;
+
+            if (tile.GetComponent<NewTileScript>().everyOtherRow)
+            {
+                xValues.Add(tileX);
+                xValues.Add(tileX - 1);
+                yValues.Add(tileY + 1);
+                yValues.Add(tileY - 1);
+            }
+            else
+            {
+                xValues.Add(tileX + 1);
+                xValues.Add(tileX);
+                yValues.Add(tileY + 1);
+                yValues.Add(tileY - 1);
+            }
+
+            xValues.Add(tileX - 1);
+            xValues.Add(tileX - 1);
+            xValues.Add(tileX - 1);
+            xValues.Add(tileX + 1);
+
+            yValues.Add(tileY + 1);
+            yValues.Add(tileY - 1);
+            yValues.Add(tileY);
+            yValues.Add(tileY);
+
+            for(int i = 0; i < allTiles.Count; i++)
+            {
+                for(int q = 0; q < xValues.Count; q++)
+                {
+                    if(xValues[q] == allTiles[i].GetComponent<NewTileScript>().x && yValues[q] == allTiles[i].GetComponent<NewTileScript>().y)
+                    {
+                        tile.GetComponent<NewTileScript>().SetMyNeighbours(allTiles[i]);
+                    }
+                }
+            }
+        }
+
 
 
 

@@ -6,11 +6,21 @@ public class NewTileScript : MonoBehaviour
 {
     [SerializeField]
     public int x, y;
+    int counter;
     [SerializeField]
     public bool everyOtherRow;
-    int[,] neighbour1, neighbour2, neighbour3, neighbour4, neighbour5, neighbour6;
     [SerializeField]
-    List<GameObject> myNeighbours;
+    public List<GameObject> myNeighbours;
+    GameObject gameManager;
+    InstantiateBoard instantiateBoardScript;
+
+    void Start()
+    {
+        counter = 0;
+        gameManager = GameObject.Find("GameManager");
+        instantiateBoardScript = gameManager.GetComponent<InstantiateBoard>();
+        StartCoroutine(SetNests());
+    }
 
     public void SetMyPosition(int xValue, int yValue, bool switchAddDir)
     {
@@ -20,13 +30,55 @@ public class NewTileScript : MonoBehaviour
     }
     public void SetMyNeighbours(GameObject neighbour)
     {
-        print(neighbour);
-        if(!myNeighbours.Contains(neighbour))
+        if (!myNeighbours.Contains(neighbour))
         {
             myNeighbours.Add(neighbour);
         }
-
     }
 
+    IEnumerator SetNests()
+    {
+        yield return new WaitUntil(() => instantiateBoardScript.allTilesInstantiated);
 
+        if (this.myNeighbours.Count == 2)
+        {
+            SetColor(gameObject);
+        }
+    }
+
+    public void SetColor(GameObject tile)
+    {
+        foreach (GameObject neighbour in myNeighbours)
+        {
+            neighbour.GetComponent<Renderer>().material.color = Color.white;
+            foreach (GameObject newNeighbour in neighbour.GetComponent<NewTileScript>().myNeighbours)
+            {
+                newNeighbour.GetComponent<Renderer>().material.color = Color.white;
+                foreach (GameObject newNewNeighbour in newNeighbour.GetComponent<NewTileScript>().myNeighbours)
+                {
+                    newNewNeighbour.GetComponent<Renderer>().material.color = Color.white;
+                }
+            }
+        }
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//for(int i = 0; i < myNeighbours.Count; i++)
+//{
+//    foreach(GameObject neighbour in myNeighbours[i].GetComponent<NewTileScript>().myNeighbours)
+//    {
+
+//    }
+//}

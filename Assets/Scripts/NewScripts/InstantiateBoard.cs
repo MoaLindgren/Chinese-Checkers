@@ -18,9 +18,11 @@ public class InstantiateBoard : MonoBehaviour
     GameObject tilePrefab;
     List<GameObject> allTiles;
     List<int> xValues, yValues;
+    public bool allTilesInstantiated;
 
     void Start()
     {
+        allTilesInstantiated = false;
         allTiles = new List<GameObject>();
         xValues = new List<int>();
         yValues = new List<int>();
@@ -76,7 +78,7 @@ public class InstantiateBoard : MonoBehaviour
             }
         }
 
-        foreach(GameObject tile in allTiles)
+        foreach (GameObject tile in allTiles)
         {
             xValues.Clear();
             yValues.Clear();
@@ -85,39 +87,60 @@ public class InstantiateBoard : MonoBehaviour
 
             if (tile.GetComponent<NewTileScript>().everyOtherRow)
             {
+                //Upp höger:
                 xValues.Add(tileX);
+                yValues.Add(tileY + 1);
+
+                //Upp vänster:
                 xValues.Add(tileX - 1);
                 yValues.Add(tileY + 1);
+
+                //Ner höger:
+                xValues.Add(tileX);
+                yValues.Add(tileY - 1);
+
+                //Ner vänster:
+                xValues.Add(tileX - 1);
                 yValues.Add(tileY - 1);
             }
             else
             {
+                //Upp höger:
                 xValues.Add(tileX + 1);
+                yValues.Add(tileY + 1);
+
+                //Upp vänster:
                 xValues.Add(tileX);
                 yValues.Add(tileY + 1);
+
+                //Ner höger:
+                xValues.Add(tileX + 1);
+                yValues.Add(tileY - 1);
+
+                //Ner vänster:
+                xValues.Add(tileX);
                 yValues.Add(tileY - 1);
             }
 
+            //Vänster:
             xValues.Add(tileX - 1);
-            xValues.Add(tileX - 1);
-            xValues.Add(tileX - 1);
+            yValues.Add(tileY);
+
+            //Höger:
             xValues.Add(tileX + 1);
-
-            yValues.Add(tileY + 1);
-            yValues.Add(tileY - 1);
-            yValues.Add(tileY);
             yValues.Add(tileY);
 
-            for(int i = 0; i < allTiles.Count; i++)
+            for (int i = 0; i < allTiles.Count; i++)
             {
-                for(int q = 0; q < xValues.Count; q++)
+                for (int q = 0; q < xValues.Count; q++)
                 {
-                    if(xValues[q] == allTiles[i].GetComponent<NewTileScript>().x && yValues[q] == allTiles[i].GetComponent<NewTileScript>().y)
+                    if (xValues[q] == allTiles[i].GetComponent<NewTileScript>().x && yValues[q] == allTiles[i].GetComponent<NewTileScript>().y)
                     {
                         tile.GetComponent<NewTileScript>().SetMyNeighbours(allTiles[i]);
                     }
                 }
             }
+            allTilesInstantiated = true;
         }
 
 

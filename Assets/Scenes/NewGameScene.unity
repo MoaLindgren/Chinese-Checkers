@@ -188,7 +188,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 340452098}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 8.1, z: -19.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -268,6 +268,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1374466814}
   - component: {fileID: 1374466813}
+  - component: {fileID: 1374466815}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -286,10 +287,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d2ee7100609f9a49bb09c0dbcdde594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  numberOfPlayers: 6
+  allTilesInstantiated: 0
   tilePrefab: {fileID: 1232692757803770, guid: 06ef1f740ebf1314fb692f1eb8f5065a, type: 2}
   marblePrefab: {fileID: 1992669737505250, guid: 21e550480cef619438c30595a983883d,
     type: 2}
-  allTilesInstantiated: 0
+  allTiles: []
 --- !u!4 &1374466814
 Transform:
   m_ObjectHideFlags: 0
@@ -303,3 +306,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1374466815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1374466812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeffa248d202e2144a5336d0c94990d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  marblePickedUp: 0
+  currentMarble: {fileID: 0}
+  currentPosition: {fileID: 0}

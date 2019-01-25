@@ -90,72 +90,9 @@ public class InstantiateBoard : MonoBehaviour
 
         foreach (GameObject tile in allTiles)
         {
-            xValues.Clear();
-            yValues.Clear();
-            int tileX = tile.GetComponent<NewTileScript>().x;
-            int tileY = tile.GetComponent<NewTileScript>().y;
-
-            if (tile.GetComponent<NewTileScript>().everyOtherRow)
-            {
-                //Upp höger:
-                xValues.Add(tileX);
-                yValues.Add(tileY + 1);
-
-                //Upp vänster:
-                xValues.Add(tileX - 1);
-                yValues.Add(tileY + 1);
-
-                //Ner höger:
-                xValues.Add(tileX);
-                yValues.Add(tileY - 1);
-
-                //Ner vänster:
-                xValues.Add(tileX - 1);
-                yValues.Add(tileY - 1);
-            }
-            else
-            {
-                //Upp höger:
-                xValues.Add(tileX + 1);
-                yValues.Add(tileY + 1);
-
-                //Upp vänster:
-                xValues.Add(tileX);
-                yValues.Add(tileY + 1);
-
-                //Ner höger:
-                xValues.Add(tileX + 1);
-                yValues.Add(tileY - 1);
-
-                //Ner vänster:
-                xValues.Add(tileX);
-                yValues.Add(tileY - 1);
-            }
-
-            //Vänster:
-            xValues.Add(tileX - 1);
-            yValues.Add(tileY);
-
-            //Höger:
-            xValues.Add(tileX + 1);
-            yValues.Add(tileY);
-
-            for (int i = 0; i < allTiles.Count; i++)
-            {
-                for (int q = 0; q < xValues.Count; q++)
-                {
-                    if (xValues[q] == allTiles[i].GetComponent<NewTileScript>().x && yValues[q] == allTiles[i].GetComponent<NewTileScript>().y)
-                    {
-                        tile.GetComponent<NewTileScript>().SetMyNeighbours(allTiles[i]);
-                    }
-                }
-            }
+            gameManagerScript.CalculateNeighbours(tile, true);
             allTilesInstantiated = true;
         }
-
-
-
-
     }
 
     public void SetNests(GameObject tile, int x, int y)

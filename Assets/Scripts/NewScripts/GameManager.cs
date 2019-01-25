@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Vad som behövs:
+//  - Att inte kunna hoppa över ALLA grannar hos den närliggande. Bara de grannar som är i samma riktning som den egna pjäsen.
+//  - Att bara kunna gå med sin egen pjäs
+//  - Turordning
+//  - Win-condition när alla ens pjäser är i motståndarens bo, eller loose-condition om tvärt om händer.
+//  - Ai med minimax
+
 public class GameManager : MonoBehaviour
 {
     public bool marblePickedUp;

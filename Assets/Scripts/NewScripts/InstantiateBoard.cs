@@ -10,18 +10,27 @@ public class InstantiateBoard : MonoBehaviour
     //          3. Vilken y-position pjäserna ska vara på (totala antalet grupperingar av heltalsvärden)
     int[,] tileCoordValues;
     int y, x, count;
-
-    bool switchRow;
+    [SerializeField]
+    int numberOfPlayers;
     float offSetValue;
 
-    [SerializeField]
-    GameObject tilePrefab;
-    List<GameObject> allTiles;
-    List<int> xValues, yValues;
+    string nestTag;
     public bool allTilesInstantiated;
+    bool switchRow, nestsReady;
+
+    [SerializeField]
+    GameObject tilePrefab, marblePrefab;
+    GameObject[] nest;
+    public List<GameObject> allTiles;
+    List<int> xValues, yValues;
+    List<string> colorList;
+    Color clr;
+    GameManager gameManagerScript;
 
     void Start()
     {
+        gameManagerScript = GetComponent<GameManager>();
+        nestsReady = false;
         allTilesInstantiated = false;
         allTiles = new List<GameObject>();
         xValues = new List<int>();
@@ -46,6 +55,7 @@ public class InstantiateBoard : MonoBehaviour
                                        { 0, 2 },
                                        { 0, 1 } };
         InstantiateTiles();
+        StartCoroutine(InstantiateMarbles());
     }
     void InstantiateTiles()
     {
@@ -146,5 +156,98 @@ public class InstantiateBoard : MonoBehaviour
 
 
 
+    }
+
+    public void SetNests(GameObject tile, int x, int y)
+    {
+        //Sätter vilken färg positionerna ska ha:
+        switch (x)
+        {
+            case 0:
+                if (y == 0)
+                {
+                    nestTag = "BlueNest";
+                    clr = Color.blue;
+                }
+                else
+                {
+                    nestTag = "RedNest";
+                    clr = Color.red;
+                }
+                break;
+            case -6:
+                if (y == 12)
+                {
+                    nestTag = "YellowNest";
+                    clr = Color.yellow;
+                }
+                else
+                {
+                    nestTag = "WhiteNest";
+                    clr = Color.white;
+                }
+                break;
+            case 6:
+                if (y == 12)
+                {
+                    nestTag = "BlackNest";
+                    clr = Color.black;
+                }
+                else
+                {
+                    nestTag = "GreenNest";
+                    clr = Color.green;
+                }
+                break;
+        }
+
+        //Hittar bon (bör generaliseras mer. hur?):
+        foreach (GameObject neighbour in tile.GetComponent<NewTileScript>().myNeighbours)
+        {
+            foreach (GameObject newNeighbour in neighbour.GetComponent<NewTileScript>().myNeighbours)
+            {
+                foreach (GameObject newNewNeighbour in newNeighbour.GetComponent<NewTileScript>().myNeighbours)
+                {
+                    newNewNeighbour.GetComponent<Renderer>().material.color = clr;
+                    newNewNeighbour.tag = nestTag;
+                }
+            }
+        }
+        nestsReady = true;
+    }
+
+    //Instansierar pjäser, så fort alla bon är klara:
+    IEnumerator InstantiateMarbles()
+    {
+        yield return new WaitUntil(() => nestsReady);
+        switch (numberOfPlayers)
+        {
+            case 2:
+                colorList = new List<string>() { "Blue", "Red" };
+                break;
+            case 3:
+                colorList = new List<string>() { "Blue", "Yellow", "Black", };
+                break;
+            case 4:
+                colorList = new List<string>() { "Blue", "Red", "Green", "Yellow" };
+                break;
+            case 6:
+                colorList = new List<string>() { "Blue", "Red", "Green", "Yellow", "White", "Black" };
+                break;
+        }
+
+        for (int i = 0; i < colorList.Count; i++)
+        {
+            nest = GameObject.FindGameObjectsWithTag(colorList[i] + "Nest");
+            foreach (GameObject tile in nest)
+            {
+                GameObject marble = Instantiate(marblePrefab, new Vector3(tile.transform.position.x,
+                                                                          tile.transform.position.y,
+                                                                          tile.transform.position.z), Quaternion.identity);
+                tile.GetComponent<NewTileScript>().taken = true;
+                marble.GetComponent<MarbleScript>().myPosition = tile;
+                marble.tag = colorList[i] + "Player";
+            }
+        }
     }
 }

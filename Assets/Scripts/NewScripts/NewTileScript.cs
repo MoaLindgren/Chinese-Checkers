@@ -7,19 +7,22 @@ public class NewTileScript : MonoBehaviour
     [SerializeField]
     public int x, y;
     int counter;
-    [SerializeField]
-    public bool everyOtherRow;
+    public bool everyOtherRow, taken;
     [SerializeField]
     public List<GameObject> myNeighbours;
     GameObject gameManager;
     InstantiateBoard instantiateBoardScript;
+    List<GameObject> nest;
+    GameManager gameManagerScript;
 
     void Start()
     {
+        taken = false;
         counter = 0;
         gameManager = GameObject.Find("GameManager");
+        gameManagerScript = gameManager.GetComponent<GameManager>();
         instantiateBoardScript = gameManager.GetComponent<InstantiateBoard>();
-        StartCoroutine(SetNests());
+        StartCoroutine(FindEndTile());
     }
 
     public void SetMyPosition(int xValue, int yValue, bool switchAddDir)
@@ -36,32 +39,24 @@ public class NewTileScript : MonoBehaviour
         }
     }
 
-    IEnumerator SetNests()
+    IEnumerator FindEndTile()
     {
         yield return new WaitUntil(() => instantiateBoardScript.allTilesInstantiated);
 
         if (this.myNeighbours.Count == 2)
         {
-            SetColor(gameObject);
+            instantiateBoardScript.SetNests(gameObject, x, y);
         }
     }
 
-    public void SetColor(GameObject tile)
+    //Optimera det här:
+    void OnMouseDown()
     {
-        foreach (GameObject neighbour in myNeighbours)
-        {
-            neighbour.GetComponent<Renderer>().material.color = Color.white;
-            foreach (GameObject newNeighbour in neighbour.GetComponent<NewTileScript>().myNeighbours)
-            {
-                newNeighbour.GetComponent<Renderer>().material.color = Color.white;
-                foreach (GameObject newNewNeighbour in newNeighbour.GetComponent<NewTileScript>().myNeighbours)
-                {
-                    newNewNeighbour.GetComponent<Renderer>().material.color = Color.white;
-                }
-            }
-        }
-
+        gameManagerScript.MoveMarble(gameObject);
     }
+
+
+
 }
 
 

@@ -287,6 +287,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 1232692757803770, guid: 06ef1f740ebf1314fb692f1eb8f5065a, type: 2}
+  marblePrefab: {fileID: 1992669737505250, guid: 21e550480cef619438c30595a983883d,
+    type: 2}
+  allTilesInstantiated: 0
 --- !u!4 &1374466814
 Transform:
   m_ObjectHideFlags: 0

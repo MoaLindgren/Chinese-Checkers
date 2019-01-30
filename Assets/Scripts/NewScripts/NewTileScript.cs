@@ -13,12 +13,14 @@ public class NewTileScript : MonoBehaviour
     GameObject gameManager;
     InstantiateBoard instantiateBoardScript;
     List<GameObject> nest;
+    public List<string> directions;
     GameManager gameManagerScript;
 
     void Start()
     {
         taken = false;
         counter = 0;
+        directions = new List<string>();
         gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
         instantiateBoardScript = gameManager.GetComponent<InstantiateBoard>();
@@ -31,11 +33,12 @@ public class NewTileScript : MonoBehaviour
         y = yValue;
         everyOtherRow = switchAddDir;
     }
-    public void SetMyNeighbours(GameObject neighbour)
+    public void SetMyNeighbours(GameObject neighbour, string direction)
     {
         if (!myNeighbours.Contains(neighbour))
         {
             myNeighbours.Add(neighbour);
+            directions.Add(direction);
         }
     }
 
@@ -55,22 +58,3 @@ public class NewTileScript : MonoBehaviour
         gameManagerScript.MoveMarble(gameObject);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-//for(int i = 0; i < myNeighbours.Count; i++)
-//{
-//    foreach(GameObject neighbour in myNeighbours[i].GetComponent<NewTileScript>().myNeighbours)
-//    {
-
-//    }
-//}

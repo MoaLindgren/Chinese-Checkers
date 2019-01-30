@@ -16,14 +16,15 @@ public class GameManager : MonoBehaviour
     List<GameObject> neighbours;
     List<GameObject> possibleMoves;
     List<int> xValues, yValues;
+    List<string> directions;
     InstantiateBoard instantiateBoardScript;
-
+    string currentPlayer;
 
     void Start()
     {
-
         xValues = new List<int>();
         yValues = new List<int>();
+        directions = new List<string>();
         instantiateBoardScript = GetComponent<InstantiateBoard>();
         possibleMoves = new List<GameObject>();
     }
@@ -32,29 +33,33 @@ public class GameManager : MonoBehaviour
         ResetHighlight();
         marblePickedUp = true;
         currentMarble = marble;
+        currentPlayer = currentMarble.tag;
         currentPosition = position;
         neighbours = currentPosition.GetComponent<NewTileScript>().myNeighbours;
 
-        foreach (GameObject neighbour in neighbours)
+        for (int i = 0; i < neighbours.Count; i++)
         {
-            if (!neighbour.GetComponent<NewTileScript>().taken)
+            if (!neighbours[i].GetComponent<NewTileScript>().taken)
             {
-                Behaviour halo = (Behaviour)neighbour.GetComponent("Halo");
+                Behaviour halo = (Behaviour)neighbours[i].GetComponent("Halo");
                 halo.enabled = true;
-                possibleMoves.Add(neighbour);
+                possibleMoves.Add(neighbours[i]);
             }
+            //Hoppa:
             else
             {
-                StartCoroutine(CalculateNeighbours(neighbour, false));
+                string direction = currentPosition.GetComponent<NewTileScript>().directions[i];
+                StartCoroutine(CalculateNeighbours(neighbours[i], false, direction));
             }
         }
     }
-    public IEnumerator CalculateNeighbours(GameObject tile, bool instantiateBoard)
+    public IEnumerator CalculateNeighbours(GameObject tile, bool instantiateBoard, string direction)
     {
         yield return new WaitUntil(() => GetComponent<InstantiateBoard>().allTilesInstantiated);
-
+        directions.Clear();
         xValues.Clear();
         yValues.Clear();
+
         int tileX = tile.GetComponent<NewTileScript>().x;
         int tileY = tile.GetComponent<NewTileScript>().y;
 
@@ -63,45 +68,55 @@ public class GameManager : MonoBehaviour
             //Upp höger:
             xValues.Add(tileX);
             yValues.Add(tileY + 1);
+            directions.Add("UpRight");
 
             //Upp vänster:
             xValues.Add(tileX - 1);
             yValues.Add(tileY + 1);
+            directions.Add("UpLeft");
 
             //Ner höger:
             xValues.Add(tileX);
             yValues.Add(tileY - 1);
+            directions.Add("DownRight");
 
             //Ner vänster:
             xValues.Add(tileX - 1);
             yValues.Add(tileY - 1);
+            directions.Add("DownLeft");
         }
         else
         {
             //Upp höger:
             xValues.Add(tileX + 1);
             yValues.Add(tileY + 1);
+            directions.Add("UpRight");
 
             //Upp vänster:
             xValues.Add(tileX);
             yValues.Add(tileY + 1);
+            directions.Add("UpLeft");
 
             //Ner höger:
             xValues.Add(tileX + 1);
             yValues.Add(tileY - 1);
+            directions.Add("DownRight");
 
             //Ner vänster:
             xValues.Add(tileX);
             yValues.Add(tileY - 1);
+            directions.Add("DownLeft");
         }
 
         //Vänster:
         xValues.Add(tileX - 1);
         yValues.Add(tileY);
+        directions.Add("Left");
 
         //Höger:
         xValues.Add(tileX + 1);
         yValues.Add(tileY);
+        directions.Add("Right");
 
         for (int i = 0; i < instantiateBoardScript.allTiles.Count; i++)
         {
@@ -113,15 +128,19 @@ public class GameManager : MonoBehaviour
                     if (instantiateBoard)
                     {
 
-                        tile.GetComponent<NewTileScript>().SetMyNeighbours(instantiateBoardScript.allTiles[i]);
+                        tile.GetComponent<NewTileScript>().SetMyNeighbours(instantiateBoardScript.allTiles[i], directions[q]);
                     }
+                    //Hoppa:
                     else
                     {
                         if (!instantiateBoardScript.allTiles[i].GetComponent<NewTileScript>().taken)
                         {
-                            Behaviour halo = (Behaviour)instantiateBoardScript.allTiles[i].GetComponent("Halo");
-                            halo.enabled = true;
-                            possibleMoves.Add(instantiateBoardScript.allTiles[i]);
+                            if (directions[q] == direction)
+                            {
+                                Behaviour halo = (Behaviour)instantiateBoardScript.allTiles[i].GetComponent("Halo");
+                                halo.enabled = true;
+                                possibleMoves.Add(instantiateBoardScript.allTiles[i]);
+                            }
                         }
                     }
                 }
@@ -155,12 +174,17 @@ public class GameManager : MonoBehaviour
                     currentMarble.GetComponent<MarbleScript>().myPosition.GetComponent<NewTileScript>().taken = false;
                     movePosition.GetComponent<NewTileScript>().taken = true;
                     currentMarble.GetComponent<MarbleScript>().myPosition = movePosition;
-
                     marblePickedUp = false;
+                    CheckWin();
                 }
             }
             ResetHighlight();
 
         }
+    }
+
+    void CheckWin()
+    {
+        
     }
 }

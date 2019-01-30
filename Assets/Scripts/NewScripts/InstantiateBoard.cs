@@ -90,7 +90,7 @@ public class InstantiateBoard : MonoBehaviour
 
         foreach (GameObject tile in allTiles)
         {
-            StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true));
+            StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true, null));
         }
 
         allTilesInstantiated = true;

@@ -19,7 +19,7 @@ public class InstantiateBoard : MonoBehaviour
     bool switchRow, nestsReady;
 
     [SerializeField]
-    GameObject tilePrefab, marblePrefab;
+    GameObject tilePrefab, marblePrefab, tempTile;
     GameObject[] nest;
     public List<GameObject> allTiles;
     List<int> xValues, yValues;
@@ -90,9 +90,10 @@ public class InstantiateBoard : MonoBehaviour
 
         foreach (GameObject tile in allTiles)
         {
-            gameManagerScript.CalculateNeighbours(tile, true);
-            allTilesInstantiated = true;
+            StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true));
         }
+
+        allTilesInstantiated = true;
     }
 
     public void SetNests(GameObject tile, int x, int y)
@@ -138,15 +139,28 @@ public class InstantiateBoard : MonoBehaviour
                 break;
         }
 
-        //Hittar bon (bör generaliseras mer. hur?):
-        foreach (GameObject neighbour in tile.GetComponent<NewTileScript>().myNeighbours)
+        tile.GetComponent<Renderer>().material.color = clr;
+        tile.tag = nestTag;
+        foreach (GameObject rowOneNeighbours in tile.GetComponent<NewTileScript>().myNeighbours)
         {
-            foreach (GameObject newNeighbour in neighbour.GetComponent<NewTileScript>().myNeighbours)
+            foreach (GameObject rowTwoNeighbours in rowOneNeighbours.GetComponent<NewTileScript>().myNeighbours)
             {
-                foreach (GameObject newNewNeighbour in newNeighbour.GetComponent<NewTileScript>().myNeighbours)
+                foreach (GameObject rowThreeNeighbours in rowTwoNeighbours.GetComponent<NewTileScript>().myNeighbours)
                 {
-                    newNewNeighbour.GetComponent<Renderer>().material.color = clr;
-                    newNewNeighbour.tag = nestTag;
+                    rowThreeNeighbours.GetComponent<Renderer>().material.color = clr;
+                    rowThreeNeighbours.tag = nestTag;
+
+                    if (numberOfPlayers == 2)
+                    {
+                        if (tile.tag == "BlueNest" || tile.tag == "RedNest")
+                        {
+                            foreach (GameObject rowFourNeighbours in rowThreeNeighbours.GetComponent<NewTileScript>().myNeighbours)
+                            {
+                                rowFourNeighbours.GetComponent<Renderer>().material.color = clr;
+                                rowFourNeighbours.tag = nestTag;
+                            }
+                        }
+                    }
                 }
             }
         }

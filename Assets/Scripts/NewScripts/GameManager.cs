@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+
         xValues = new List<int>();
         yValues = new List<int>();
         instantiateBoardScript = GetComponent<InstantiateBoard>();
@@ -44,12 +45,13 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                CalculateNeighbours(neighbour, false);
+                StartCoroutine(CalculateNeighbours(neighbour, false));
             }
         }
     }
-    public void CalculateNeighbours(GameObject tile, bool instantiateBoard)
+    public IEnumerator CalculateNeighbours(GameObject tile, bool instantiateBoard)
     {
+        yield return new WaitUntil(() => GetComponent<InstantiateBoard>().allTilesInstantiated);
 
         xValues.Clear();
         yValues.Clear();
@@ -110,13 +112,13 @@ public class GameManager : MonoBehaviour
                 {
                     if (instantiateBoard)
                     {
+
                         tile.GetComponent<NewTileScript>().SetMyNeighbours(instantiateBoardScript.allTiles[i]);
                     }
                     else
                     {
                         if (!instantiateBoardScript.allTiles[i].GetComponent<NewTileScript>().taken)
                         {
-
                             Behaviour halo = (Behaviour)instantiateBoardScript.allTiles[i].GetComponent("Halo");
                             halo.enabled = true;
                             possibleMoves.Add(instantiateBoardScript.allTiles[i]);
@@ -126,9 +128,6 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-
-
 
     public void ResetHighlight()
     {

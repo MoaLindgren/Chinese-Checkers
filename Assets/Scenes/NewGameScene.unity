@@ -287,11 +287,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d2ee7100609f9a49bb09c0dbcdde594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfPlayers: 6
+  numberOfPlayers: 2
   allTilesInstantiated: 0
   tilePrefab: {fileID: 1232692757803770, guid: 06ef1f740ebf1314fb692f1eb8f5065a, type: 2}
   marblePrefab: {fileID: 1992669737505250, guid: 21e550480cef619438c30595a983883d,
     type: 2}
+  tempTile: {fileID: 0}
   allTiles: []
 --- !u!4 &1374466814
 Transform:

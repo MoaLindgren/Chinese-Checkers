@@ -54,9 +54,6 @@ public class NewTileScript : MonoBehaviour
     {
         gameManagerScript.MoveMarble(gameObject);
     }
-
-
-
 }
 
 

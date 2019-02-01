@@ -14,6 +14,6 @@ public class MenuManager : MonoBehaviour
     {
         gameManagerScript.moveAgain = false;
         gameManagerScript.ResetValues();
-        gameManagerScript.Turns(null);
+        gameManagerScript.Turns();
     }
 }

@@ -1,5 +1,4 @@
-﻿//Moa Lindgren m. hjälp av Björn Andersson, 2019-02-01
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

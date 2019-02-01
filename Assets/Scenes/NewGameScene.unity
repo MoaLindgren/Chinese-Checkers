@@ -639,10 +639,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1374466812}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d2ee7100609f9a49bb09c0dbcdde594, type: 3}
+  m_Script: {fileID: 11500000, guid: 6df6e33e917d24a4bb0450e285fe2354, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfPlayers: 2
+  numberOfPlayers: 6
   allTilesInstantiated: 0
   allMarblesInstantiated: 0
   tilePrefab: {fileID: 1232692757803770, guid: 06ef1f740ebf1314fb692f1eb8f5065a, type: 2}
@@ -657,7 +657,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1374466812}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.88, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -678,9 +678,11 @@ MonoBehaviour:
   playerTurn: 0
   moveAgain: 0
   currentPosition: {fileID: 0}
+  currentMarble: {fileID: 0}
   possibleMoves: []
   allTiles: []
   playerList: []
+  currentPlayer: 
 --- !u!114 &1374466816
 MonoBehaviour:
   m_ObjectHideFlags: 0

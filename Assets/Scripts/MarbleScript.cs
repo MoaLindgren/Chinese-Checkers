@@ -21,7 +21,7 @@ public class MarbleScript : MonoBehaviour
     {
 
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        SetOpponent();
+        StartCoroutine(SetOpponent());
     }
     void OnMouseDown()
     {
@@ -31,8 +31,9 @@ public class MarbleScript : MonoBehaviour
         }
 
     }
-    void SetOpponent()
+    IEnumerator SetOpponent()
     {
+        yield return new WaitUntil(() => gameManager.GetComponent<InstantiateBoard>().allMarblesInstantiated);
         opponents = new string[,] { { "Blue", "Red" },
                                     { "Yellow", "Green" },
                                     { "Black", "White" } };
@@ -49,15 +50,17 @@ public class MarbleScript : MonoBehaviour
                 if (gameObject.tag == opponents[q, 1])
                 {
                     opponentNest = GameObject.FindGameObjectsWithTag(opponents[q, 0] + "Nest");
-                    foreach(GameObject tileGO in opponentNest)
-                    {
-                        if(tileGO.GetComponent<NewTileScript>().myNeighbours.Count == 2)
-                        {
-                            player.GoalTile = tileGO.GetComponent<NewTileScript>();
-                        }
-                    }
                     break;
                 }
+            }
+        }
+
+        foreach (GameObject tileGO in opponentNest)
+        {
+            if (tileGO.GetComponent<NewTileScript>().myNeighbours.Count == 2)
+            {
+                //print(player.tag);
+                player.GoalTile = tileGO.GetComponent<NewTileScript>();
             }
         }
     }

@@ -39,9 +39,14 @@ public class Minimax
         get { return previousTiles; }
     }
 
+    bool jump;
+
     public Minimax(NpcBehaviour npc, MarbleScript marble, NewTileScript tileToMoveTo, GameManager gameManager, List<NewTileScript> previousTiles, bool jump)
     {
+        this.bestNode = this;
+        score = -Mathf.Infinity;
         this.npc = npc;
+        this.jump = jump;
         this.marble = marble;
         this.tileToMoveTo = tileToMoveTo;
         this.gameManager = gameManager;
@@ -49,7 +54,7 @@ public class Minimax
 
         gameManager.MoveMarbleScript(marble.gameObject, tileToMoveTo.gameObject);
         previousTiles.Add(tileToMoveTo);
-        if (jump)
+        if (jump && gameManager.playerList[(gameManager.playerList.IndexOf(marble.Player.PlayerColor) + 1) % gameManager.playerList.Count] + "Player" != gameManager.CurrentPlayer)
         {
             gameManager.MarblePicked(marble.gameObject, tileToMoveTo.gameObject, true, true, this);
             gameManager.StartMinimax(this);
@@ -98,14 +103,12 @@ public class Minimax
 
         //En if-sats för att kolla så att den spelare minimax kollar efter nu inte är den nuvarande spelaren 
         //(dvs. den kollar på de återstående spelarnas potentiella drag):
-        if (gameManager.playerList[(gameManager.playerList.IndexOf(marble.Player.PlayerColor) + 1) % gameManager.playerList.Count] != gameManager.CurrentPlayer)
+        if (!jump && gameManager.playerList[(gameManager.playerList.IndexOf(marble.Player.PlayerColor) + 1) % gameManager.playerList.Count] != gameManager.CurrentPlayer)
         {
             //Sätter vilken som är nästa spelare:
             GameObject nextPlayer = GameObject.FindGameObjectWithTag(gameManager.playerList[(gameManager.playerList.IndexOf(marble.Player.PlayerColor) + 1) % gameManager.playerList.Count] + "Player");
             NpcBehaviour nextPlayerScript = nextPlayer.GetComponent<NpcBehaviour>();
 
-
-            //yield return new WaitUntil(() => legalMoves != null); // Ska inte denna vara efter foreach-loopen?
             float bestOppValue = -Mathf.Infinity;
             //För varje pjäs som nästa spelare har ...
             foreach (GameObject opponentMarble in nextPlayerScript.Marbles)
@@ -115,18 +118,22 @@ public class Minimax
 
                 //GameManager kommer i sin tur att sätta värden i legalMoves, därför väntar vi tills legalMoves inte är null längre:
                 yield return new WaitUntil(() => legalMoves != null);
-
-
+                if (legalMoves.Count < 1)
+                {
+                    legalMoves = null;
+                    continue;
+                }
 
                 //Därefter kolla varje drag i legalMoves:
                 foreach (NewTileScript move in legalMoves)
                 {
                     List<NewTileScript> marblePath = new List<NewTileScript>();
                     marblePath.Add(opponentMarble.GetComponent<MarbleScript>().myPosition.GetComponent<NewTileScript>());
-                    Minimax newNode = new Minimax(nextPlayerScript, opponentMarble.GetComponent<MarbleScript>(), move, gameManager, marblePath, move.jumpPosition);
+                    Minimax newNode = new Minimax(npc, opponentMarble.GetComponent<MarbleScript>(), move, gameManager, marblePath, move.jumpPosition);
 
                     yield return new WaitUntil(() => newNode.Done == true);
-                    if(newNode.BestNode.Score > bestOppValue)
+
+                    if (newNode.BestNode.Score > bestOppValue)
                     {
                         bestOppValue = newNode.BestNode.Score;
                     }
@@ -141,6 +148,7 @@ public class Minimax
     public IEnumerator StartMinimax()
     {
         yield return new WaitUntil(() => this.legalJumps != null);
+
         foreach (NewTileScript tile in previousTiles)
         {
             if (legalJumps.Contains(tile))
@@ -148,6 +156,7 @@ public class Minimax
                 legalJumps.Remove(tile);
             }
         }
+
         if (legalJumps.Count > 0)
         {
             foreach (NewTileScript jump in legalJumps)
@@ -160,6 +169,9 @@ public class Minimax
                 }
             }
         }
+
         gameManager.StartCalculation(this);
+
+
     }
 }

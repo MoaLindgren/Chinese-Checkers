@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
 {
     public bool marblePickedUp, playerTurn, moveAgain;
     bool win, npcTurn;
-    public GameObject currentPosition;
+    public GameObject currentPosition, currentMarble;
     List<GameObject> neighbours;
     [SerializeField]
     List<GameObject> possibleMoves, allTiles;
@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     List<string> directions;
     public List<string> playerList;
     InstantiateBoard instantiateBoardScript;
+    [SerializeField]
     string currentPlayer;
     NpcBehaviour npcBehaviourScript;
 
@@ -61,13 +62,15 @@ public class GameManager : MonoBehaviour
     //Följande startar hela uträkningen för vart en pjäs kan gå:
     public void MarblePicked(GameObject marble, GameObject position, bool npc, bool jumpOnly, Minimax node)
     {
+        currentMarble = marble;
         List<PossibleMove> firstLegalMoves = new List<PossibleMove>();
         List<NewTileScript> legalMoves = new List<NewTileScript>();
         npcTurn = npc;
         marblePickedUp = true;
-        currentPlayer = marble.tag;
+        //currentPlayer = marble.tag;
         currentPosition = position;
         neighbours = currentPosition.GetComponent<NewTileScript>().myNeighbours;
+
 
         for (int i = 0; i < neighbours.Count; i++)
         {
@@ -89,6 +92,11 @@ public class GameManager : MonoBehaviour
                         firstLegalMoves.Add(new PossibleMove(marble.GetComponent<MarbleScript>(), neighbours[i].GetComponent<NewTileScript>()));
                     }
                 }
+                if (npcTurn && node != null && i == neighbours.Count - 1 && legalMoves != null && legalMoves.Count > 0)
+                {
+                    node.AllMoves(legalMoves);
+
+                }
 
             }
 
@@ -98,10 +106,9 @@ public class GameManager : MonoBehaviour
                 string direction = currentPosition.GetComponent<NewTileScript>().directions[i];
                 StartCoroutine(CalculateNeighbours(neighbours[i], false, direction, marble, node, legalMoves, jumpOnly, firstLegalMoves));
             }
-
-
         }
     }
+
     public IEnumerator CalculateNeighbours(GameObject tile, bool instantiateBoard, string direction, GameObject marble, Minimax node, List<NewTileScript> legalMoves, bool jumpOnly, List<PossibleMove> firstLegalMoves)
     {
         if (!GetComponent<InstantiateBoard>().allTilesInstantiated)
@@ -227,8 +234,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            print(currentPlayer);
-            GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().FirstLegalMoves = firstLegalMoves;
+            if(firstLegalMoves != null)
+            {
+                GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().FirstLegalMoves = firstLegalMoves;
+            }
+
         }
     }
 
@@ -257,11 +267,13 @@ public class GameManager : MonoBehaviour
 
             }
             ResetValues();
-            CheckWin(movePosition, marble);
-
-
+            if (playerTurn)
+            {
+                CheckWin(movePosition, marble);
+            }
         }
     }
+
     public void MoveMarbleScript(GameObject currentMarble, GameObject movePosition)
     {
         currentMarble.GetComponent<MarbleScript>().myPosition.GetComponent<NewTileScript>().taken = false;
@@ -287,6 +299,7 @@ public class GameManager : MonoBehaviour
         }
 
     }
+
     public void CheckWin(GameObject movePosition, GameObject marble)
     {
         foreach (GameObject opponentTile in marble.GetComponent<MarbleScript>().opponentNest)
@@ -315,9 +328,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            if (!moveAgain || npcTurn)
+            if (!moveAgain)
             {
-                Turns();
+                if (playerTurn || !GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer)
+                    Turns();
+
             }
             else
             {
@@ -354,7 +369,7 @@ public class GameManager : MonoBehaviour
         {
             playerTurn = false;
             npcTurn = true;
-            //Kalla på FÖRSTA minimax
+            GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().MyTurn();
         }
     }
 

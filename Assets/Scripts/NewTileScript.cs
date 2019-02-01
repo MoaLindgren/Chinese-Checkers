@@ -60,7 +60,7 @@ public class NewTileScript : MonoBehaviour
     {
         if(this.moveHere && gameManagerScript.playerTurn)
         {
-            gameManagerScript.MoveMarble(gameObject, myMarble);
+            gameManagerScript.MoveMarble(gameObject, gameManagerScript.currentMarble);
         }
 
     }

@@ -12,8 +12,14 @@ public class NpcBehaviour : MonoBehaviour
     GameManager gameManagerScript;
     NewTileScript goalTile;
     List<PossibleMove> firstLegalMoves;
+    bool activePlayer = false;
 
     Minimax bestNode;
+
+    public bool ActivePlayer
+    {
+        get { return activePlayer; }
+    }
 
     public GameObject[] Marbles
     {
@@ -26,7 +32,7 @@ public class NpcBehaviour : MonoBehaviour
     public NewTileScript GoalTile
     {
         get { return goalTile; }
-        set { if(goalTile == null) goalTile = value; }
+        set { if (goalTile == null) goalTile = value; }
     }
     public List<PossibleMove> FirstLegalMoves
     {
@@ -44,7 +50,7 @@ public class NpcBehaviour : MonoBehaviour
     {
         yield return new WaitUntil(() => gameManager.GetComponent<InstantiateBoard>().allMarblesInstantiated);
         marbles = GameObject.FindGameObjectsWithTag(playerColor);
-        foreach(GameObject marble in marbles)
+        foreach (GameObject marble in marbles)
         {
             marble.GetComponent<MarbleScript>().Player = this;
         }
@@ -60,6 +66,9 @@ public class NpcBehaviour : MonoBehaviour
 
     public void MyTurn()
     {
+        if (activePlayer)
+            return;
+        activePlayer = true;
         bestNode = null;
         firstLegalMoves = null;
         StartCoroutine(WaitForMoves());
@@ -73,11 +82,13 @@ public class NpcBehaviour : MonoBehaviour
             gameManagerScript.MarblePicked(marble, marblePosition, true, false, null);
         }
         yield return new WaitUntil(() => firstLegalMoves != null);
-        foreach(PossibleMove move in firstLegalMoves)
+
+        foreach (PossibleMove move in firstLegalMoves)
         {
+
             Minimax node = new Minimax(this, move.Marble, move.Tile, gameManagerScript, new List<NewTileScript>() { move.Marble.myPosition.GetComponent<NewTileScript>() }, move.Tile.jumpPosition);
             yield return new WaitUntil(() => node.Done);
-            if (bestNode == null || node.BestNode.Score > bestNode.Score)
+            if (bestNode == null || node.BestNode.Score > bestNode.Score && node.BestNode.PreviousTiles != null && node.BestNode.PreviousTiles.Count > 1)
             {
                 bestNode = node.BestNode;
             }
@@ -87,12 +98,14 @@ public class NpcBehaviour : MonoBehaviour
 
     IEnumerator Move()
     {
-        for(int i = 1; i < bestNode.PreviousTiles.Count; i++)
+       
+        for (int i = 1; i < bestNode.PreviousTiles.Count; i++)
         {
             yield return new WaitForSeconds(0.5f);
             gameManagerScript.MoveMarble(bestNode.PreviousTiles[i].gameObject, bestNode.Marble.gameObject);
+
         }
-        
+        activePlayer = false;
         gameManagerScript.CheckWin(bestNode.PreviousTiles[bestNode.PreviousTiles.Count - 1].gameObject, bestNode.Marble.gameObject);
     }
 }

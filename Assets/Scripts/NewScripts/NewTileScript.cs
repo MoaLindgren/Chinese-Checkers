@@ -7,10 +7,11 @@ public class NewTileScript : MonoBehaviour
     [SerializeField]
     public int x, y;
     int counter;
-    public bool everyOtherRow, taken;
+    public bool everyOtherRow, taken, jumpPosition, moveHere;
     [SerializeField]
     public List<GameObject> myNeighbours;
     GameObject gameManager;
+    public GameObject myMarble;
     InstantiateBoard instantiateBoardScript;
     List<GameObject> nest;
     public List<string> directions;
@@ -18,6 +19,8 @@ public class NewTileScript : MonoBehaviour
 
     void Start()
     {
+        moveHere = false;
+        jumpPosition = false;
         taken = false;
         counter = 0;
         directions = new List<string>();
@@ -52,9 +55,12 @@ public class NewTileScript : MonoBehaviour
         }
     }
 
-    //Optimera det här:
     void OnMouseDown()
     {
-        gameManagerScript.MoveMarble(gameObject);
+        if(this.moveHere && gameManagerScript.playerTurn)
+        {
+            gameManagerScript.MoveMarble(gameObject, myMarble);
+        }
+
     }
 }

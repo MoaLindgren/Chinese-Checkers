@@ -13,9 +13,10 @@ public class InstantiateBoard : MonoBehaviour
     [SerializeField]
     int numberOfPlayers;
     float offSetValue;
+    int countMarbles;
 
     string nestTag;
-    public bool allTilesInstantiated;
+    public bool allTilesInstantiated, allMarblesInstantiated;
     bool switchRow, nestsReady;
 
     [SerializeField]
@@ -23,8 +24,9 @@ public class InstantiateBoard : MonoBehaviour
     GameObject[] nest;
     public List<GameObject> allTiles;
     List<int> xValues, yValues;
-    List<string> colorList;
+    public List<string> playerList;
     Color clr;
+    List<Color> colors;
     GameManager gameManagerScript;
 
     void Start()
@@ -32,11 +34,13 @@ public class InstantiateBoard : MonoBehaviour
         gameManagerScript = GetComponent<GameManager>();
         nestsReady = false;
         allTilesInstantiated = false;
+        allMarblesInstantiated = false;
         allTiles = new List<GameObject>();
         xValues = new List<int>();
         yValues = new List<int>();
         switchRow = true;
         count = 0;
+        countMarbles = 0;
         tileCoordValues = new int[,] { { 0, 1 },
                                        { 0, 2 },
                                        { -1, 3 },
@@ -62,7 +66,7 @@ public class InstantiateBoard : MonoBehaviour
         //Börjar med att gå igenom matrisen en gång för att använda i-värdet som start för x-koordinaten, samt för att sätta en y-koordinat.
         for (int i = 0; i < tileCoordValues.Length / 2; i++)
         {
-            y = i;
+            y = i -8;
 
             //Varannan rad behöver en offset för x-positionerna:
             if (switchRow)
@@ -90,7 +94,7 @@ public class InstantiateBoard : MonoBehaviour
 
         foreach (GameObject tile in allTiles)
         {
-            StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true, null));
+            StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true, null, null, null));
         }
 
         allTilesInstantiated = true;
@@ -174,31 +178,44 @@ public class InstantiateBoard : MonoBehaviour
         switch (numberOfPlayers)
         {
             case 2:
-                colorList = new List<string>() { "Blue", "Red" };
+                playerList = new List<string>() { "Blue", "Red" };
+                colors = new List<Color>() { Color.blue, Color.red };
                 break;
             case 3:
-                colorList = new List<string>() { "Blue", "Yellow", "Black", };
+                playerList = new List<string>() { "Blue", "Yellow", "Black", };
+                colors = new List<Color>() { Color.blue, Color.yellow, Color.black };
                 break;
             case 4:
-                colorList = new List<string>() { "Blue", "Red", "Green", "Yellow" };
+                playerList = new List<string>() { "Blue", "Red", "Green", "Yellow" };
+                colors = new List<Color>() { Color.blue, Color.red, Color.green, Color.yellow };
                 break;
             case 6:
-                colorList = new List<string>() { "Blue", "Red", "Green", "Yellow", "White", "Black" };
+                playerList = new List<string>() { "Blue", "Red", "Green", "Yellow", "White", "Black" };
+                colors = new List<Color>() { Color.blue, Color.red, Color.green, Color.yellow, Color.white, Color.black };
                 break;
         }
 
-        for (int i = 0; i < colorList.Count; i++)
+        gameManagerScript.playerList = playerList;
+
+
+        for (int i = 0; i < playerList.Count; i++)
         {
-            nest = GameObject.FindGameObjectsWithTag(colorList[i] + "Nest");
+            nest = GameObject.FindGameObjectsWithTag(playerList[i] + "Nest");
+            countMarbles = 0;
             foreach (GameObject tile in nest)
             {
+                countMarbles++;
                 GameObject marble = Instantiate(marblePrefab, new Vector3(tile.transform.position.x,
                                                                           tile.transform.position.y,
                                                                           tile.transform.position.z), Quaternion.identity);
                 tile.GetComponent<NewTileScript>().taken = true;
+                tile.GetComponent<NewTileScript>().myMarble = marble;
                 marble.GetComponent<MarbleScript>().myPosition = tile;
-                marble.tag = colorList[i] + "Player";
+                marble.tag = playerList[i];
+                marble.GetComponent<Renderer>().material.color = colors[i];
+                marble.name = playerList[i] + countMarbles;
             }
         }
+        allMarblesInstantiated = true;
     }
 }

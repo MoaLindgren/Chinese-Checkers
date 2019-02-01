@@ -17,6 +17,12 @@ TagManager:
   - BlackPlayer
   - WhitePlayer
   - Highlight
+  - Blue
+  - Red
+  - Yellow
+  - Green
+  - Black
+  - White
   layers:
   - Default
   - TransparentFX

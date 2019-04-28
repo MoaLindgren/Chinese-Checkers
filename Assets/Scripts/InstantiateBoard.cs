@@ -25,8 +25,7 @@ public class InstantiateBoard : MonoBehaviour
     List<Color> colors;
     GameManager gameManagerScript;
 
-    void Start()
-    {
+    void Start() {
         gameManagerScript = GetComponent<GameManager>();
         nestsReady = false;
         allTilesInstantiated = false;
@@ -70,10 +69,8 @@ public class InstantiateBoard : MonoBehaviour
     }
 
     //Instantierar positioner:
-    void InstantiateTiles()
-    {
-        switch (numberOfPlayers)
-        {
+    void InstantiateTiles() {
+        switch (numberOfPlayers) {
             case 2:
                 playerList = new List<string>() { "Blue", "Red" };
                 colors = new List<Color>() { Color.blue, Color.red };
@@ -93,24 +90,20 @@ public class InstantiateBoard : MonoBehaviour
         }
         gameManagerScript.playerList = playerList;
         //Börjar med att gå igenom matrisen en gång för att använda i-värdet som start för x-koordinaten, samt för att sätta en y-koordinat.
-        for (int i = 0; i < tileCoordValues.Length / 2; i++)
-        {
+        for (int i = 0; i < tileCoordValues.Length / 2; i++) {
             y = i - 8; // För att koordinaten (0, 0) ska vara i mitten av brädet så sätts y-värdet som i - 8.
 
             //Varannan rad behöver en offset för x-positionerna:
-            if (switchRow)
-            {
+            if (switchRow) {
                 offSetValue = 0.5f;
             }
-            else
-            {
+            else {
                 offSetValue = 0;
             }
             switchRow = !switchRow;
 
             //En till loop för att kunna kolla nästa steg i matrisen, nämligen hur många pjäser som ska finnas på den nuvarande raden.
-            for (int q = 0; q < tileCoordValues[i, 1]; q++)
-            {
+            for (int q = 0; q < tileCoordValues[i, 1]; q++) {
                 count++;
                 x = tileCoordValues[i, 0] + q;
                 GameObject tile = Instantiate(tilePrefab, new Vector3(x + offSetValue, y, 0), Quaternion.identity);
@@ -122,8 +115,7 @@ public class InstantiateBoard : MonoBehaviour
         }
 
         //Hitta grannar:
-        foreach (GameObject tile in allTiles)
-        {
+        foreach (GameObject tile in allTiles) {
             StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true, null, null, null, null, false, null));
         }
 
@@ -132,8 +124,7 @@ public class InstantiateBoard : MonoBehaviour
     }
 
     //Sätter vilka positioner som ska tillhöra ett bo:
-    public void SetNests(GameObject tile, int x, int y)
-    {
+    public void SetNests(GameObject tile, int x, int y) {
         #region Nest Values
         switch (x)
         {
@@ -180,21 +171,15 @@ public class InstantiateBoard : MonoBehaviour
         tile.tag = nestTag;
 
         //Följande hittar alla platser som ska tillhöra ett bo:
-        foreach (GameObject rowOneNeighbours in tile.GetComponent<NewTileScript>().myNeighbours)
-        {
-            foreach (GameObject rowTwoNeighbours in rowOneNeighbours.GetComponent<NewTileScript>().myNeighbours)
-            {
-                foreach (GameObject rowThreeNeighbours in rowTwoNeighbours.GetComponent<NewTileScript>().myNeighbours)
-                {
+        foreach (GameObject rowOneNeighbours in tile.GetComponent<NewTileScript>().myNeighbours) {
+            foreach (GameObject rowTwoNeighbours in rowOneNeighbours.GetComponent<NewTileScript>().myNeighbours) {
+                foreach (GameObject rowThreeNeighbours in rowTwoNeighbours.GetComponent<NewTileScript>().myNeighbours) {
                     rowThreeNeighbours.GetComponent<Renderer>().material.color = clr;
                     rowThreeNeighbours.tag = nestTag;
 
-                    if (numberOfPlayers == 2)
-                    {
-                        if (tile.tag == "BlueNest" || tile.tag == "RedNest")
-                        {
-                            foreach (GameObject rowFourNeighbours in rowThreeNeighbours.GetComponent<NewTileScript>().myNeighbours)
-                            {
+                    if (numberOfPlayers == 2) {
+                        if (tile.tag == "BlueNest" || tile.tag == "RedNest") {
+                            foreach (GameObject rowFourNeighbours in rowThreeNeighbours.GetComponent<NewTileScript>().myNeighbours) {
                                 rowFourNeighbours.GetComponent<Renderer>().material.color = clr;
                                 rowFourNeighbours.tag = nestTag;
                             }
@@ -207,16 +192,13 @@ public class InstantiateBoard : MonoBehaviour
     }
 
     //Instansierar pjäser, så fort alla bon är klara:
-    IEnumerator InstantiateMarbles()
-    {
+    IEnumerator InstantiateMarbles() {
         yield return new WaitUntil(() => nestsReady);
 
-        for (int i = 0; i < playerList.Count; i++)
-        {
+        for (int i = 0; i < playerList.Count; i++) {
             nest = GameObject.FindGameObjectsWithTag(playerList[i] + "Nest");
             countMarbles = 0;
-            foreach (GameObject tile in nest)
-            {
+            foreach (GameObject tile in nest) {
                 countMarbles++;
                 GameObject marble = Instantiate(marblePrefab, new Vector3(tile.transform.position.x,
                                                                           tile.transform.position.y,

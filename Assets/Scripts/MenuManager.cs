@@ -6,12 +6,10 @@ public class MenuManager : MonoBehaviour
 {
     GameManager gameManagerScript;
 
-    void Start()
-    {
+    void Start() {
         gameManagerScript = GetComponent<GameManager>();
     }
-    public void Done()
-    {
+    public void Done() {
         gameManagerScript.moveAgain = false;
         gameManagerScript.ResetValues();
         gameManagerScript.Turns();

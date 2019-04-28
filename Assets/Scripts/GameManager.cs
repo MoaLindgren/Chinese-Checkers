@@ -7,17 +7,11 @@ public struct PossibleMove
     MarbleScript marble;
     NewTileScript tile;
 
-    public MarbleScript Marble
-    {
-        get { return marble; }
-    }
-    public NewTileScript Tile
-    {
-        get { return tile; }
-    }
+    public MarbleScript Marble { get { return marble; } }
 
-    public PossibleMove(MarbleScript marble, NewTileScript tile)
-    {
+    public NewTileScript Tile { get { return tile; } }
+
+    public PossibleMove(MarbleScript marble, NewTileScript tile) {
         this.marble = marble;
         this.tile = tile;
     }
@@ -39,13 +33,11 @@ public class GameManager : MonoBehaviour
     string currentPlayer;
     NpcBehaviour npcBehaviourScript;
 
-    public string CurrentPlayer
-    {
+    public string CurrentPlayer {
         get { return currentPlayer; }
     }
 
-    void Start()
-    {
+    void Start() {
         npcTurn = false;
         playerTurn = true;
         moveAgain = false;
@@ -59,8 +51,7 @@ public class GameManager : MonoBehaviour
     }
 
     //Följande startar hela uträkningen för vart en pjäs kan gå:
-    public void MarblePicked(GameObject marble, GameObject position, bool npc, bool jumpOnly, Minimax node)
-    {
+    public void MarblePicked(GameObject marble, GameObject position, bool npc, bool jumpOnly, Minimax node) {
         currentMarble = marble;
         List<PossibleMove> firstLegalMoves = new List<PossibleMove>();
         List<NewTileScript> legalMoves = new List<NewTileScript>();
@@ -71,28 +62,22 @@ public class GameManager : MonoBehaviour
         neighbours = currentPosition.GetComponent<NewTileScript>().myNeighbours;
 
 
-        for (int i = 0; i < neighbours.Count; i++)
-        {
-            if (!neighbours[i].GetComponent<NewTileScript>().taken)
-            {
-                if (!jumpOnly)
-                {
-                    if (!npcTurn)
-                    {
+        for (int i = 0; i < neighbours.Count; i++) {
+            if (!neighbours[i].GetComponent<NewTileScript>().taken) {
+                if (!jumpOnly) {
+                    if (!npcTurn) {
                         neighbours[i].GetComponent<NewTileScript>().moveHere = true;
                         possibleMoves.Add(neighbours[i]);
                         Behaviour halo = (Behaviour)neighbours[i].GetComponent("Halo");
                         halo.enabled = true;
                     }
-                    else if (npcTurn)
-                    {
+                    else if (npcTurn) {
                         //Här sätts närliggande positioner som npc kan gå till:
                         legalMoves.Add(neighbours[i].GetComponent<NewTileScript>());
                         firstLegalMoves.Add(new PossibleMove(marble.GetComponent<MarbleScript>(), neighbours[i].GetComponent<NewTileScript>()));
                     }
                 }
-                if (npcTurn && node != null && i == neighbours.Count - 1 && legalMoves != null && legalMoves.Count > 0)
-                {
+                if (npcTurn && node != null && i == neighbours.Count - 1 && legalMoves != null && legalMoves.Count > 0) {
                     node.AllMoves(legalMoves);
 
                 }
@@ -100,18 +85,16 @@ public class GameManager : MonoBehaviour
             }
 
             //Hoppa:
-            else
-            {
+            else {
                 string direction = currentPosition.GetComponent<NewTileScript>().directions[i];
                 StartCoroutine(CalculateNeighbours(neighbours[i], false, direction, marble, node, legalMoves, jumpOnly, firstLegalMoves));
             }
         }
     }
 
-    public IEnumerator CalculateNeighbours(GameObject tile, bool instantiateBoard, string direction, GameObject marble, Minimax node, List<NewTileScript> legalMoves, bool jumpOnly, List<PossibleMove> firstLegalMoves)
-    {
-        if (!GetComponent<InstantiateBoard>().allTilesInstantiated)
-        {
+    public IEnumerator CalculateNeighbours
+    (GameObject tile, bool instantiateBoard, string direction, GameObject marble, Minimax node, List<NewTileScript> legalMoves, bool jumpOnly, List<PossibleMove> firstLegalMoves) {
+        if (!GetComponent<InstantiateBoard>().allTilesInstantiated) {
             yield return new WaitUntil(() => GetComponent<InstantiateBoard>().allTilesInstantiated);
         }
         allTiles = GetComponent<InstantiateBoard>().allTiles;
@@ -179,37 +162,26 @@ public class GameManager : MonoBehaviour
         directions.Add("Right");
         #endregion
 
-        for (int i = 0; i < allTiles.Count; i++)
-        {
+        for (int i = 0; i < allTiles.Count; i++) {
 
-            for (int q = 0; q < xValues.Count; q++)
-            {
+            for (int q = 0; q < xValues.Count; q++) {
                 if (xValues[q] == allTiles[i].GetComponent<NewTileScript>().x &&
-                    yValues[q] == allTiles[i].GetComponent<NewTileScript>().y)
-                {
-                    if (instantiateBoard)
-                    {
-
+                    yValues[q] == allTiles[i].GetComponent<NewTileScript>().y) {
+                    if (instantiateBoard) {
                         tile.GetComponent<NewTileScript>().SetMyNeighbours(allTiles[i], directions[q]);
                     }
                     //Hoppa:
-                    else
-                    {
-                        if (!allTiles[i].GetComponent<NewTileScript>().taken)
-                        {
-
-                            if (directions[q] == direction)
-                            {
+                    else {
+                        if (!allTiles[i].GetComponent<NewTileScript>().taken) {
+                            if (directions[q] == direction) {
                                 allTiles[i].GetComponent<NewTileScript>().jumpPosition = true;
-                                if (!npcTurn)
-                                {
+                                if (!npcTurn) {
                                     allTiles[i].GetComponent<NewTileScript>().moveHere = true;
                                     possibleMoves.Add(allTiles[i]);
                                     Behaviour halo = (Behaviour)allTiles[i].GetComponent("Halo");
                                     halo.enabled = true;
                                 }
-                                else
-                                {
+                                else {
                                     //Här sätts hopp-positioner för npc:
                                     legalMoves.Add(allTiles[i].GetComponent<NewTileScript>());
                                     firstLegalMoves.Add(new PossibleMove(marble.GetComponent<MarbleScript>(), allTiles[i].GetComponent<NewTileScript>()));
@@ -220,42 +192,31 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
-        if (node != null)
-        {
-            if (jumpOnly)
-            {
+        if (node != null) {
+            if (jumpOnly) {
                 node.Jump(legalMoves);
             }
-            else
-            {
+            else {
                 node.AllMoves(legalMoves);
             }
         }
-        else
-        {
-            if(firstLegalMoves != null)
-            {
+        else {
+            if(firstLegalMoves != null) {
                 GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().FirstLegalMoves = firstLegalMoves;
             }
 
         }
     }
 
-    public void MoveMarble(GameObject movePosition, GameObject marble)
-    {
-        if (marblePickedUp)
-        {
-            foreach (GameObject position in possibleMoves)
-            {
-                if (movePosition == position)
-                {
-                    if (movePosition.GetComponent<NewTileScript>().jumpPosition)
-                    {
+    public void MoveMarble(GameObject movePosition, GameObject marble) {
+        if (marblePickedUp) {
+            foreach (GameObject position in possibleMoves) {
+                if (movePosition == position) {
+                    if (movePosition.GetComponent<NewTileScript>().jumpPosition) {
                         moveAgain = true;
                         marblePickedUp = true;
                     }
-                    else
-                    {
+                    else {
                         moveAgain = false;
                         marblePickedUp = false;
                     }
@@ -266,15 +227,13 @@ public class GameManager : MonoBehaviour
 
             }
             ResetValues();
-            if (playerTurn)
-            {
+            if (playerTurn) {
                 CheckWin(movePosition, marble);
             }
         }
     }
 
-    public void MoveMarbleScript(GameObject currentMarble, GameObject movePosition)
-    {
+    public void MoveMarbleScript(GameObject currentMarble, GameObject movePosition) {
         currentMarble.GetComponent<MarbleScript>().myPosition.GetComponent<NewTileScript>().taken = false;
         currentMarble.GetComponent<MarbleScript>().myPosition.GetComponent<NewTileScript>().myMarble = null;
         movePosition.GetComponent<NewTileScript>().taken = true;
@@ -283,12 +242,9 @@ public class GameManager : MonoBehaviour
         movePosition.GetComponent<NewTileScript>().jumpPosition = false;
     }
 
-    public void ResetValues()
-    {
-        if (neighbours != null)
-        {
-            foreach (GameObject pos in possibleMoves)
-            {
+    public void ResetValues() {
+        if (neighbours != null) {
+            foreach (GameObject pos in possibleMoves) {
                 Behaviour halo = (Behaviour)pos.GetComponent("Halo");
                 halo.enabled = false;
                 pos.GetComponent<NewTileScript>().moveHere = false;
@@ -296,88 +252,69 @@ public class GameManager : MonoBehaviour
             }
             possibleMoves.Clear();
         }
-
     }
 
-    public void CheckWin(GameObject movePosition, GameObject marble)
-    {
-        foreach (GameObject opponentTile in marble.GetComponent<MarbleScript>().opponentNest)
-        {
-            if (opponentTile.GetComponent<NewTileScript>().myMarble != null)
-            {
-                if (opponentTile.GetComponent<NewTileScript>().myMarble.tag == marble.tag)
-                {
+    public void CheckWin(GameObject movePosition, GameObject marble) {
+        foreach (GameObject opponentTile in marble.GetComponent<MarbleScript>().opponentNest) {
+            if (opponentTile.GetComponent<NewTileScript>().myMarble != null) {
+                if (opponentTile.GetComponent<NewTileScript>().myMarble.tag == marble.tag) {
                     win = true;
                 }
-                else
-                {
+                else {
                     win = false;
                     break;
                 }
             }
-            else
-            {
+            else {
                 win = false;
                 break;
             }
         }
-        if (win)
-        {
+        if (win) {
             print(marble.tag + "Player won!");
         }
-        else
-        {
-            if (!moveAgain)
-            {
+        else {
+            if (!moveAgain) {
                 if (playerTurn || !GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer)
                     Turns();
 
             }
-            else
-            {
-                if (playerTurn)
-                {
+            else {
+                if (playerTurn) {
                     MarblePicked(marble, movePosition, false, true, null);
                 }
             }
         }
     }
-    public void Turns()
-    {
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            if (currentPlayer == playerList[i])
-            {
-                if (i == playerList.Count - 1)
-                {
+
+    public void Turns() {
+        for (int i = 0; i < playerList.Count; i++) {
+            if (currentPlayer == playerList[i]) {
+                if (i == playerList.Count - 1) {
                     currentPlayer = playerList[0];
                 }
-                else
-                {
+                else {
                     currentPlayer = playerList[i + 1];
                 }
                 break;
             }
         }
 
-        if (currentPlayer == "Blue")
-        {
+        if (currentPlayer == "Blue") {
             playerTurn = true;
         }
-        else
-        {
+        else {
             playerTurn = false;
             npcTurn = true;
             GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().MyTurn();
         }
     }
 
-    public void StartMinimax(Minimax node)
-    {
+    public void StartMinimax(Minimax node) {
         StartCoroutine(node.StartMinimax());
     }
-    public void StartCalculation(Minimax node)
-    {
+
+    public void StartCalculation(Minimax node) {
         StartCoroutine(node.CalculateValue());
     }
 }

@@ -24,6 +24,7 @@ public class NpcBehaviour : MonoBehaviour
         get { return goalTile; }
         set { if (goalTile == null) goalTile = value; }
     }
+
     public List<PossibleMove> FirstLegalMoves {
         set { firstLegalMoves = value; }
     }

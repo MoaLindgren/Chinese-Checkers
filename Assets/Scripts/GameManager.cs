@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     public List<string> playerList;
     InstantiateBoard instantiateBoardScript;
     [SerializeField]
-    string currentPlayer;
+    string currentPlayer, lookAtPlayer;
     NpcBehaviour npcBehaviourScript;
 
     public string CurrentPlayer {
@@ -48,6 +48,13 @@ public class GameManager : MonoBehaviour
         npcBehaviourScript = GetComponent<NpcBehaviour>();
         possibleMoves = new List<GameObject>();
         currentPlayer = playerList[0];
+
+        for(int i = 0; i < playerList.Count; i++) {
+            if(playerList[i] == currentPlayer) {
+                lookAtPlayer = playerList[i + 1];
+                break;
+            }
+        }
     }
 
     //Följande startar hela uträkningen för vart en pjäs kan gå:
@@ -201,35 +208,39 @@ public class GameManager : MonoBehaviour
             }
         }
         else {
-            if(firstLegalMoves != null) {
-                GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().FirstLegalMoves = firstLegalMoves;
+            if(firstLegalMoves != null && firstLegalMoves.Count > 0) {
+                GameObject.FindGameObjectWithTag(lookAtPlayer + "Player").GetComponent<NpcBehaviour>().FirstLegalMoves = firstLegalMoves;
             }
-
         }
     }
 
     public void MoveMarble(GameObject movePosition, GameObject marble) {
         if (marblePickedUp) {
-            foreach (GameObject position in possibleMoves) {
-                if (movePosition == position) {
-                    if (movePosition.GetComponent<NewTileScript>().jumpPosition) {
-                        moveAgain = true;
-                        marblePickedUp = true;
-                    }
-                    else {
-                        moveAgain = false;
-                        marblePickedUp = false;
-                    }
-                    marble.transform.position = movePosition.transform.position;
+            if(playerTurn) {
+                foreach (GameObject position in possibleMoves) {
+                    if (movePosition == position) {
+                        if (movePosition.GetComponent<NewTileScript>().jumpPosition) {
+                            moveAgain = true;
+                            marblePickedUp = true;
+                        }
+                        else {
+                            moveAgain = false;
+                            marblePickedUp = false;
+                        }
+                        marble.transform.position = movePosition.transform.position;
+                        GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer = false;
+                        GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved = true;
 
-                    MoveMarbleScript(marble, movePosition);
+                        MoveMarbleScript(marble, movePosition);
+                    }
                 }
-
-            }
-            ResetValues();
-            if (playerTurn) {
                 CheckWin(movePosition, marble);
             }
+            else {
+                marble.transform.position = movePosition.transform.position;
+                MoveMarbleScript(marble, movePosition);
+            }
+            ResetValues();
         }
     }
 
@@ -255,6 +266,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void CheckWin(GameObject movePosition, GameObject marble) {
+        print("am i here? ");
         foreach (GameObject opponentTile in marble.GetComponent<MarbleScript>().opponentNest) {
             if (opponentTile.GetComponent<NewTileScript>().myMarble != null) {
                 if (opponentTile.GetComponent<NewTileScript>().myMarble.tag == marble.tag) {
@@ -275,9 +287,15 @@ public class GameManager : MonoBehaviour
         }
         else {
             if (!moveAgain) {
-                if (playerTurn || !GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer)
-                    Turns();
-
+                print(GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved);
+                if (playerTurn || GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved) {
+                    print("WHY");
+                    SwitchCurrentPlayer();
+                }
+                else/* if (!GameObject.FindGameObjectWithTag(lookAtPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer)*/
+                {
+                    SwitchLookAtPlayer();
+                }
             }
             else {
                 if (playerTurn) {
@@ -287,18 +305,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void Turns() {
-        for (int i = 0; i < playerList.Count; i++) {
-            if (currentPlayer == playerList[i]) {
-                if (i == playerList.Count - 1) {
-                    currentPlayer = playerList[0];
-                }
-                else {
-                    currentPlayer = playerList[i + 1];
-                }
-                break;
-            }
-        }
+    public void SwitchCurrentPlayer() {
+        marblePickedUp = false;
+        currentPlayer = playerList[(playerList.IndexOf(currentPlayer) + 1) % playerList.Count];
+        lookAtPlayer = currentPlayer;
 
         if (currentPlayer == "Blue") {
             playerTurn = true;
@@ -308,6 +318,16 @@ public class GameManager : MonoBehaviour
             npcTurn = true;
             GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().MyTurn();
         }
+    }
+
+    public void SwitchLookAtPlayer() {
+        lookAtPlayer = playerList[(playerList.IndexOf(lookAtPlayer) + 1) % playerList.Count];
+        if(lookAtPlayer == currentPlayer) {
+            SwitchCurrentPlayer();
+            return;
+        }
+
+        StartCoroutine(GameObject.FindGameObjectWithTag(lookAtPlayer + "Player").GetComponent<NpcBehaviour>().WaitForMoves());
     }
 
     public void StartMinimax(Minimax node) {

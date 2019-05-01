@@ -12,6 +12,6 @@ public class MenuManager : MonoBehaviour
     public void Done() {
         gameManagerScript.moveAgain = false;
         gameManagerScript.ResetValues();
-        gameManagerScript.Turns();
+        gameManagerScript.SwitchCurrentPlayer();
     }
 }

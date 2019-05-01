@@ -12,9 +12,18 @@ public class NpcBehaviour : MonoBehaviour
     NewTileScript goalTile;
     List<PossibleMove> firstLegalMoves;
     bool activePlayer = false;
+    bool moved = false;
     Minimax bestNode;
 
-    public bool ActivePlayer { get { return activePlayer; } }
+    public bool ActivePlayer {
+        get { return activePlayer; }
+        set { activePlayer = value; }
+    }
+
+    public bool Moved {
+        get { return moved; }
+        set { moved = value; }
+    }
 
     public GameObject[] Marbles { get { return marbles; } }
 
@@ -52,39 +61,55 @@ public class NpcBehaviour : MonoBehaviour
     }
 
     public void MyTurn() {
-        if (activePlayer) {
-            return;
-        }
+        //if (activePlayer) {
+        //    return;
+        //}
 
+        moved = false;
         activePlayer = true;
         bestNode = null;
         firstLegalMoves = null;
         StartCoroutine(WaitForMoves());
     }
 
-    IEnumerator WaitForMoves() {
+    public IEnumerator WaitForMoves() {
+        moved = false;
+        bestNode = null;
         foreach (GameObject marble in marbles) {
             marblePosition = marble.GetComponent<MarbleScript>().myPosition;
             gameManagerScript.MarblePicked(marble, marblePosition, true, false, null);
         }
+        print(playerColor + " hej " + firstLegalMoves);
         yield return new WaitUntil(() => firstLegalMoves != null);
 
         foreach (PossibleMove move in firstLegalMoves) {
             Minimax node = new Minimax(this, move.Marble, move.Tile, gameManagerScript, new List<NewTileScript>() { move.Marble.myPosition.GetComponent<NewTileScript>() }, move.Tile.jumpPosition);
+
             yield return new WaitUntil(() => node.Done);
-            if (bestNode == null || node.BestNode.Score > bestNode.Score && node.BestNode.PreviousTiles != null && node.BestNode.PreviousTiles.Count > 1) {
+
+            if (bestNode == null || (node.BestNode.Score > bestNode.Score && node.BestNode.PreviousTiles != null && node.BestNode.PreviousTiles.Count > 1)) {
                 bestNode = node.BestNode;
+
             }
         }
         StartCoroutine(Move());
     }
 
     IEnumerator Move() {
-        for (int i = 1; i < bestNode.PreviousTiles.Count; i++) {
-            yield return new WaitForSeconds(0.5f);
-            gameManagerScript.MoveMarble(bestNode.PreviousTiles[i].gameObject, bestNode.Marble.gameObject);
+
+        if (bestNode != null) {
+            for (int i = 0; i < bestNode.PreviousTiles.Count; i++) { // i var 1 förut, om det blir problem här
+                yield return new WaitForSeconds(0.5f);
+                gameManagerScript.MoveMarble(bestNode.PreviousTiles[i].gameObject, bestNode.Marble.gameObject);
+            }
+            activePlayer = false;
+            moved = true;
+            gameManagerScript.CheckWin(bestNode.PreviousTiles[bestNode.PreviousTiles.Count - 1].gameObject, bestNode.Marble.gameObject);
         }
-        activePlayer = false;
-        gameManagerScript.CheckWin(bestNode.PreviousTiles[bestNode.PreviousTiles.Count - 1].gameObject, bestNode.Marble.gameObject);
+        else
+        {
+            print("something's wrong");
+        }
+
     }
 }

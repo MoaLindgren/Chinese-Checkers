@@ -228,8 +228,8 @@ public class GameManager : MonoBehaviour
                             marblePickedUp = false;
                         }
                         marble.transform.position = movePosition.transform.position;
-                        GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer = false;
-                        GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved = true;
+                        //GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer = false;
+                        //GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved = true;
 
                         MoveMarbleScript(marble, movePosition);
                     }
@@ -266,7 +266,6 @@ public class GameManager : MonoBehaviour
     }
 
     public void CheckWin(GameObject movePosition, GameObject marble) {
-        print("am i here? ");
         foreach (GameObject opponentTile in marble.GetComponent<MarbleScript>().opponentNest) {
             if (opponentTile.GetComponent<NewTileScript>().myMarble != null) {
                 if (opponentTile.GetComponent<NewTileScript>().myMarble.tag == marble.tag) {
@@ -287,19 +286,20 @@ public class GameManager : MonoBehaviour
         }
         else {
             if (!moveAgain) {
-                print(GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved);
                 if (playerTurn || GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved) {
-                    print("WHY");
                     SwitchCurrentPlayer();
                 }
-                else/* if (!GameObject.FindGameObjectWithTag(lookAtPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer)*/
-                {
+                else/* if (!GameObject.FindGameObjectWithTag(lookAtPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer)*/ {
                     SwitchLookAtPlayer();
                 }
             }
             else {
                 if (playerTurn) {
                     MarblePicked(marble, movePosition, false, true, null);
+                }
+                else {
+                    GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().ActivePlayer = false;
+                    GameObject.FindGameObjectWithTag(currentPlayer + "Player").GetComponent<NpcBehaviour>().Moved = true;
                 }
             }
         }

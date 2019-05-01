@@ -73,8 +73,6 @@ public class NpcBehaviour : MonoBehaviour
     }
 
     public IEnumerator WaitForMoves() {
-        moved = false;
-        bestNode = null;
         foreach (GameObject marble in marbles) {
             marblePosition = marble.GetComponent<MarbleScript>().myPosition;
             gameManagerScript.MarblePicked(marble, marblePosition, true, false, null);
@@ -92,6 +90,7 @@ public class NpcBehaviour : MonoBehaviour
 
             }
         }
+
         StartCoroutine(Move());
     }
 
@@ -102,9 +101,7 @@ public class NpcBehaviour : MonoBehaviour
                 yield return new WaitForSeconds(0.5f);
                 gameManagerScript.MoveMarble(bestNode.PreviousTiles[i].gameObject, bestNode.Marble.gameObject);
             }
-            activePlayer = false;
-            moved = true;
-            gameManagerScript.CheckWin(bestNode.PreviousTiles[bestNode.PreviousTiles.Count - 1].gameObject, bestNode.Marble.gameObject);
+
         }
         else
         {

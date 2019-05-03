@@ -21,8 +21,9 @@ public class MarbleScript : MonoBehaviour
     }
      
     void OnMouseDown() {
-        if (gameObject.tag == "Blue" && gameManager.GetComponent<GameManager>().playerTurn && !gameManager.GetComponent<GameManager>().moveAgain) {
-            gameManager.MarblePicked(gameObject, myPosition, false, false, null);
+        if (gameObject.tag == "Blue" && gameManager.playerState == PlayerState.Player && !gameManager.moveAgain) {
+            gameManager.ResetValues(true);
+            gameManager.MarblePicked(gameObject, myPosition, false, null, null);
         }
     }
 

@@ -24,6 +24,7 @@ public class InstantiateBoard : MonoBehaviour
     Color clr;
     List<Color> colors;
     GameManager gameManagerScript;
+    MenuManager menuManager;
 
     void Start() {
         gameManagerScript = GetComponent<GameManager>();
@@ -36,6 +37,9 @@ public class InstantiateBoard : MonoBehaviour
         switchRow = true;
         count = 0;
         countMarbles = 0;
+        menuManager = GameObject.Find("Canvas").GetComponent<MenuManager>();
+        numberOfPlayers = menuManager.NumberOfPlayer;
+
         //Följande matris har information om följande:
         //          1. Vilken x-koordinat en ny rad startar med (första värdet).
         //          2. Hur många pjäser som ska vara på varje rad (andra värdet).
@@ -57,16 +61,10 @@ public class InstantiateBoard : MonoBehaviour
                                        { -1, 3 },
                                        { 0, 2 },
                                        { 0, 1 } };
-        //SetPlayers();
         InstantiateTiles();
         StartCoroutine(InstantiateMarbles());
     }
 
-    //Sätter playerList beroende på hur många spelare som spelar.
-    void SetPlayers()
-    {
-
-    }
 
     //Instantierar positioner:
     void InstantiateTiles() {
@@ -116,7 +114,7 @@ public class InstantiateBoard : MonoBehaviour
 
         //Hitta grannar:
         foreach (GameObject tile in allTiles) {
-            StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true, null, null, null, null, false, null));
+            StartCoroutine(gameManagerScript.CalculateNeighbours(tile, true, null, null, null, null, false, null, null));
         }
 
         //När alla tiles har instantierats:

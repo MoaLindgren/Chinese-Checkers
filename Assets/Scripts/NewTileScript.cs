@@ -51,8 +51,9 @@ public class NewTileScript : MonoBehaviour
     }
 
     void OnMouseDown() {
-        if(this.moveHere && gameManagerScript.playerTurn) {
+        if(this.moveHere && gameManagerScript.playerState == PlayerState.Player) {
             gameManagerScript.MoveMarble(gameObject, gameManagerScript.currentMarble);
+            gameManagerScript.ResetValues(false);
         }
 
     }

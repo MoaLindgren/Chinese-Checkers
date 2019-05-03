@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Minimax
-{
+public class Minimax {
     MarbleScript marble;
     NewTileScript tileToMoveTo;
     NpcBehaviour npc;
@@ -37,15 +36,15 @@ public class Minimax
         this.previousTiles = previousTiles;
 
         gameManager.MoveMarbleScript(marble.gameObject, tileToMoveTo.gameObject);
+
         previousTiles.Add(tileToMoveTo);
         if (jump && gameManager.playerList[(gameManager.playerList.IndexOf(marble.Player.PlayerColor) + 1) % gameManager.playerList.Count] + "Player" != gameManager.CurrentPlayer) {
-            gameManager.MarblePicked(marble.gameObject, tileToMoveTo.gameObject, true, true, this);
-            gameManager.StartMinimax(this);
+            gameManager.MarblePicked(marble.gameObject, tileToMoveTo.gameObject, true, this, npc);
         }
         else {
             bestNode = this;
-            gameManager.StartCalculation(this);
         }
+        gameManager.StartMinimax(this);
     }
 
     //Följande sätter alla drag som npc kan göra:
@@ -84,6 +83,7 @@ public class Minimax
         //En if-sats för att kolla så att den spelare minimax kollar efter nu inte är den nuvarande spelaren 
         //(dvs. den kollar på de återstående spelarnas potentiella drag):
         if (!jump && gameManager.playerList[(gameManager.playerList.IndexOf(marble.Player.PlayerColor) + 1) % gameManager.playerList.Count] != gameManager.CurrentPlayer) {
+            gameManager.playerState = PlayerState.NpcMinimax;
             //Sätter vilken som är nästa spelare:
             GameObject nextPlayer = GameObject.FindGameObjectWithTag(gameManager.playerList[(gameManager.playerList.IndexOf(marble.Player.PlayerColor) + 1) % gameManager.playerList.Count] + "Player");
             NpcBehaviour nextPlayerScript = nextPlayer.GetComponent<NpcBehaviour>();
@@ -92,7 +92,7 @@ public class Minimax
             //För varje pjäs som nästa spelare har ...
             foreach (GameObject opponentMarble in nextPlayerScript.Marbles) {
                 //Kolla vart den kan gå:
-                gameManager.MarblePicked(opponentMarble, opponentMarble.GetComponent<MarbleScript>().myPosition, true, false, this);
+                gameManager.MarblePicked(opponentMarble, opponentMarble.GetComponent<MarbleScript>().myPosition,/* true,*/ false, this, nextPlayerScript);
 
                 //GameManager kommer i sin tur att sätta värden i legalMoves, därför väntar vi tills legalMoves inte är null längre:
                 yield return new WaitUntil(() => legalMoves != null);
@@ -117,17 +117,16 @@ public class Minimax
             this.score -= bestOppValue;
         }
         done = true;
+        gameManager.ResetValues(true);
     }
 
-    public IEnumerator StartMinimax() {
+    public IEnumerator StartMinimax () {
         yield return new WaitUntil(() => this.legalJumps != null);
-
         foreach (NewTileScript tile in previousTiles) {
             if (legalJumps.Contains(tile)) {
                 legalJumps.Remove(tile);
             }
         }
-
         if (legalJumps.Count > 0) {
             foreach (NewTileScript jump in legalJumps) {
                 Minimax minimax = new Minimax(npc, marble, jump, gameManager, previousTiles, true);

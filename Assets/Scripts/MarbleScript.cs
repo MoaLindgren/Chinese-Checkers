@@ -22,7 +22,7 @@ public class MarbleScript : MonoBehaviour
      
     void OnMouseDown() {
         if (gameObject.tag == "Blue" && gameManager.playerState == PlayerState.Player && !gameManager.moveAgain) {
-            gameManager.ResetValues(true);
+            gameManager.ResetValues(false, null, null);
             gameManager.MarblePicked(gameObject, myPosition, false, null, null);
         }
     }

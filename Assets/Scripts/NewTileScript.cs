@@ -7,7 +7,8 @@ public class NewTileScript : MonoBehaviour
     [SerializeField]
     public int x, y;
     int counter;
-    public bool everyOtherRow, taken, jumpPosition, moveHere;
+    [HideInInspector] public bool everyOtherRow;
+    public bool taken, jumpPosition, moveHere;
     [SerializeField]
     public List<GameObject> myNeighbours;
     GameObject gameManager;
@@ -53,7 +54,7 @@ public class NewTileScript : MonoBehaviour
     void OnMouseDown() {
         if(this.moveHere && gameManagerScript.playerState == PlayerState.Player) {
             gameManagerScript.MoveMarble(gameObject, gameManagerScript.currentMarble);
-            gameManagerScript.ResetValues(false);
+            //gameManagerScript.ResetValues(true, r);
         }
 
     }

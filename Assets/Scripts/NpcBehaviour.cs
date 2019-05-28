@@ -71,11 +71,12 @@ public class NpcBehaviour : MonoBehaviour
 
         foreach (PossibleMove move in firstLegalMoves) {
             Minimax node = new Minimax(this, move.Marble, move.Tile, gameManagerScript, new List<NewTileScript>() { move.Marble.myPosition.GetComponent<NewTileScript>() }, move.Tile.jumpPosition);
-            yield return new WaitUntil(() => node.Done);
             if (bestNode == null || (node.BestNode.Score > bestNode.Score && node.BestNode.PreviousTiles != null && node.BestNode.PreviousTiles.Count > 1)) {
+                yield return new WaitUntil(() => node.Done);
                 bestNode = node.BestNode;
             }
         }
+
 
         StartCoroutine(Move());
     }
@@ -83,12 +84,12 @@ public class NpcBehaviour : MonoBehaviour
     IEnumerator Move() {
 
         if (bestNode != null) {
+            Debug.Log(bestNode.Score);
             for (int i = 0; i < bestNode.PreviousTiles.Count; i++) {
                 yield return new WaitForSeconds(0.5f);
-                if(i >= bestNode.PreviousTiles.Count - 1) {
+                gameManagerScript.MoveMarble(bestNode.PreviousTiles[i].gameObject, bestNode.Marble.gameObject);
+                if (i >= bestNode.PreviousTiles.Count - 1) {
                     gameManagerScript.moveAgain = false;
-
-                    gameManagerScript.MoveMarble(bestNode.PreviousTiles[i].gameObject, bestNode.Marble.gameObject);
                 }
             }
             moved = true;

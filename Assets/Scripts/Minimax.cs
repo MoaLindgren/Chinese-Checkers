@@ -117,7 +117,7 @@ public class Minimax {
             this.score -= bestOppValue;
         }
         done = true;
-        gameManager.ResetValues(true);
+        gameManager.ResetValues(false, null, null);
     }
 
     public IEnumerator StartMinimax () {

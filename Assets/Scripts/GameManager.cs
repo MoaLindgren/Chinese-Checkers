@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour {
         currentPlayer = playerList[0];
     }
 
-    //Följande startar hela uträkningen för vart en pjäs kan gå:
+    // Följande startar hela uträkningen för vart en pjäs kan gå:
     public void MarblePicked(GameObject marble, GameObject position, bool jumpOnly, Minimax node, NpcBehaviour npcPlayerToLookAt) {
         currentMarble = marble;
         List<PossibleMove> firstLegalMoves = new List<PossibleMove>();
@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour {
                         halo.enabled = true;
                     }
                     else if (playerState == PlayerState.Npc || playerState == PlayerState.NpcMinimax) {
-                        //Här sätts närliggande positioner som npc kan gå till:
+                        // Här sätts närliggande positioner som npc kan gå till:
                         legalMoves.Add(neighbours[i].GetComponent<NewTileScript>());
                         firstLegalMoves.Add(new PossibleMove(marble.GetComponent<MarbleScript>(), neighbours[i].GetComponent<NewTileScript>()));
                         possibleMoves.Add(neighbours[i]);
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour {
                     }
                 }
             }
-            //Hoppa:
+            // Hoppa:
             else {
                 string direction = currentPosition.GetComponent<NewTileScript>().directions[i];
                 StartCoroutine(CalculateNeighbours(neighbours[i], false, direction, marble, node, legalMoves, jumpOnly, firstLegalMoves, npcPlayerToLookAt));
@@ -166,7 +166,7 @@ public class GameManager : MonoBehaviour {
                     if (instantiateBoard) {
                         tile.GetComponent<NewTileScript>().SetMyNeighbours(allTiles[i], directions[q]);
                     }
-                    //Hoppa:
+                    // Hoppa:
                     else {
                         if (!allTiles[i].GetComponent<NewTileScript>().taken) {
                             if (directions[q] == direction) {
@@ -179,7 +179,7 @@ public class GameManager : MonoBehaviour {
                                     halo.enabled = true;
                                 }
                                 else if (playerState == PlayerState.Npc || playerState == PlayerState.NpcMinimax) {
-                                    //Här sätts hopp-positioner för npc:
+                                    // Här sätts hopp-positioner för npc:
                                     legalMoves.Add(allTiles[i].GetComponent<NewTileScript>());
                                     firstLegalMoves.Add(new PossibleMove(marble.GetComponent<MarbleScript>(), allTiles[i].GetComponent<NewTileScript>()));
                                     possibleMoves.Add(allTiles[i]);
@@ -204,7 +204,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void MoveMarble(GameObject movePosition, GameObject marble) {
-        if (marblePickedUp && possibleMoves.Contains(movePosition)) {
+        if (marblePickedUp && possibleMoves.Contains(movePosition) || playerState == PlayerState.Npc) {
             // Spelaren kan fortsätta spela:
             if (movePosition.GetComponent<NewTileScript>().jumpPosition) {
                 moveAgain = true;
@@ -218,9 +218,8 @@ public class GameManager : MonoBehaviour {
             // Fysiska förflyttningen:
             marble.transform.position = movePosition.transform.position;
             bool win = WinningMove(marble);
-            if (playerState == PlayerState.Player) {
-                ResetValues(false);
-            }
+
+            ResetValues(true, marble, movePosition);
             
             // Förflyttning av script: 
             MoveMarbleScript(marble, movePosition);
@@ -244,22 +243,19 @@ public class GameManager : MonoBehaviour {
         return true;
     }
 
-    public void ResetValues(bool fromMarblePick) {
-        if (fromMarblePick) {
-            if (neighbours != null) {
-                foreach (GameObject pos in possibleMoves) {
-                    pos.GetComponent<NewTileScript>().taken = false;
-                    pos.GetComponent<NewTileScript>().myMarble = null;
-                    pos.GetComponent<NewTileScript>().moveHere = false;
-                    pos.GetComponent<NewTileScript>().jumpPosition = false;
+    public void ResetValues(bool physicalMovement, GameObject marble, GameObject position) {
+        if (physicalMovement) {
+            NewTileScript fromPos = marble.GetComponent<MarbleScript>().myPosition.GetComponent<NewTileScript>();
+            NewTileScript toPos = position.GetComponent<NewTileScript>();
 
-                    Behaviour halo = (Behaviour)pos.GetComponent("Halo");
-                    halo.enabled = false;
-                }
-                possibleMoves.Clear();
-            }
+            fromPos.taken = false;
+            fromPos.myMarble = null;
+
+            toPos.taken = true;
+            toPos.myMarble = marble;
+            toPos.moveHere = false;
+            toPos.jumpPosition = false;
         }
-        else {
             switch (playerState) {
                 case (PlayerState.Player):
                     if (neighbours != null) {
@@ -295,7 +291,6 @@ public class GameManager : MonoBehaviour {
                     }
                     return;
             }
-        }
     }
 
     public void MoveMarbleScript(GameObject currentMarble, GameObject movePosition) {
